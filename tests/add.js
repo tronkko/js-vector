@@ -35,12 +35,18 @@ Test.module ('Vector.add', function () {
     }, [ 1, 2, 3, 1 ]);
 
     /*  Right-hand operand is not modified by addition */
-    this.test ('sanity-112.1', function () {
+    this.test ('add-112.1', function () {
         var a = new Vector (1, 2, 3);
         var b = new Vector (10, 20, 30);
         var v = a.add (b);
         return [ b.x, b.y, b.z, b.w ];
     }, [ 10, 20, 30, 1 ]);
 
+    /* Adding vector with itself is same as multiplying by 2 */
+    this.test ('add-120.0', function () {
+        var a = new Vector (1, 2, 3);
+        var v = a.add (a);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 2, 4, 6, 1 ]);
 });
 

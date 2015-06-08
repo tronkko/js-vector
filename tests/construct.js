@@ -11,43 +11,139 @@
 Test.module ('Vector.construct', function () {
 
     /* Basic construction from 2d-coordinate */
-    this.test ('construct-101.0', function () {
+    this.test ('construct-100.0', function () {
         var v = new Vector (1, 2);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1, 2, 0, 1 ]);
 
+    /* 
+     * Construction of basic 2d-coordinate fails if the argument is not a
+     * valid number.
+     */
+    this.test ('construct-101.0', function () {
+        var ok = false;
+        try {
+
+            /* Try to create a vector with invalid coordinate */
+            var v = new Vector ('2aba', 2);
+
+        }
+        catch (e) {
+            /* Got an exception as expected */
+            ok = true;
+        }
+        return ok;
+    });
+
     /* Basic construction from 3d-coordinate */
-    this.test ('construct-102.0', function () {
+    this.test ('construct-110.0', function () {
         var v = new Vector (1, 2, 3);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1, 2, 3, 1 ]);
 
-    /* Construction of zero-length vector */
-    this.test ('construct-103.0', function () {
+    /* 
+     * Construction of basic 3d-coordinate fails if the argument is not a
+     * valid number.
+     */
+    this.test ('construct-111.0', function () {
+        var ok = false;
+        try {
+
+            /* Try to create a vector with invalid coordinate */
+            var v = new Vector (1, [2], 3);
+
+        }
+        catch (e) {
+            /* Got an exception as expected */
+            ok = true;
+        }
+        return ok;
+    });
+
+    /* Construct zero-length vector */
+    this.test ('construct-120.0', function () {
         var v = new Vector ();
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0, 0, 0, 1 ]);
 
     /* Copy-construct */
-    this.test ('construct-104.0', function () {
+    this.test ('construct-130.0', function () {
         var src = new Vector (1, 2, 3);
         var v = new Vector (src);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1, 2, 3, 1 ]);
 
+    /* Copy-construct fails with null object */
+    this.test ('construct-131.0', function () {
+        var ok = false;
+        try {
+
+            /* Try to create a vector with null object */
+            var v = new Vector (null);
+
+        }
+        catch (e) {
+            /* Got an exception as expected */
+            ok = true;
+        }
+        return ok;
+    });
+
+    /* Copy-construct fails with non-vector object */
+    this.test ('construct-132.0', function () {
+        var ok = false;
+        try {
+
+            /* Try to create a vector with an non-compatible object */
+            var v = new Vector ({ a: 123 });
+
+        }
+        catch (e) {
+            /* Got an exception as expected */
+            ok = true;
+        }
+        return ok;
+    });
+
     /* 
-     * Construction from 3d-coordinate with w component causes x, y and z
-     * component to change.
+     * Construction from 3d-coordinate with the w component causes x, y and z
+     * component to be altered.
      */
-    this.test ('construct-105.0', function () {
+    this.test ('construct-140.0', function () {
         var v = new Vector (1, 2, 3, 4);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0.25, 0.5, 0.75, 1.0 ]);
 
-    /* Cloning */
-    this.test ('construct-106.0', function () {
+    /* Construction with invalid w component fails */
+    this.test ('construct-141.0', function () {
+        var ok = false;
+        try {
+
+            /* Try to create a vector with invalid w component */
+            var v = new Vector (1, 2, 3, 0);
+
+        }
+        catch (e) {
+            /* Got an exception as expected */
+            ok = true;
+        }
+        return ok;
+    });
+
+    /* Cloning a vector preserves the original coordinate */
+    this.test ('construct-150.0', function () {
+        /* Create source vector */
         var a = new Vector (1, 2, 3, 4);
+
+        /* Clone vector */
         var v = a.clone ();
+
+        /* Change source vector directly */
+        a.x = 0;
+        a.y = 234;
+        a.z = 11;
+
+        /* Original coordinate can still be found from vector v */
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0.25, 0.5, 0.75, 1.0 ]);
 
