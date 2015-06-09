@@ -20,84 +20,153 @@
  *   (5) as new Vector (x, y, z, w)
  *
  * The first form creates a zero-length vector, the second form creates copy
- * of the vector v and the forms 3 to 5 construct vector from 2d or 3d
- * coordinate.
+ * of the vector or array v and the forms 3 to 5 construct vector from 2d
+ * or 3d coordinate.
  *
  * Example:
  *
- *     // Create basic 2d vector
+ *     // Create basic 2d vector and output it (third form)
  *     var v = new Vector (100, 50);
- *
- *     // Output coordinate 100,50
  *     alert ('Vector v = ' + v.x + ',' + v.y);
  *
- * @param mixed x
+ *     // Create copy of vector a (second form)
+ *     var v = new Vector (a);
+ *
+ *     // Construct 3d vector from array (second form)
+ *     var v = new Vector ([ 100, 50, 0 ]);
+ *
+ * @param mixed x Number, vector or array
  * @param float y
  * @param float z
  * @param float w
  */
 function Vector (/*args*/) {
-    if (arguments.length == 2) {
+    /* Get list of arguments */
+    var args;
+    if (arguments.length == 1) {
 
-        /* Construct from 2d-coordinate */
-        this.x = Vector.parseFloat (arguments[0]);
-        this.y = Vector.parseFloat (arguments[1]);
-        this.z = 0;
-        this.w = 1;
-
-    } else if (arguments.length == 3) {
-
-        /* Construct from 3d-coordinate */
-        this.x = Vector.parseFloat (arguments[0]);
-        this.y = Vector.parseFloat (arguments[1]);
-        this.z = Vector.parseFloat (arguments[2]);
-        this.w = 1;
-
-    } else if (arguments.length == 1) {
-
-        /* Copy-construct */
-        var src = arguments[0];
-        if (typeof src == 'object'  &&  src  &&  src instanceof Vector) {
-            this.x = src.x;
-            this.y = src.y;
-            this.z = src.z;
-            this.w = src.w;
-        } else {
+        /* Exactly one argument provided: treat it as object or array */
+        args = arguments[0];
+        if (!args  ||  typeof args != 'object') {
             throw new Error ('Invalid argument');
-        }
-
-    } else if (arguments.length == 0) {
-
-        /* Construct zero-length vector */
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.w = 1;
-
-    } else if (arguments.length == 4) {
-
-        /* Construct 3d-coordinate with w component */
-        var w = Vector.parseFloat (arguments[3]);
-        if (Math.abs (w) > 1.0e-6) {
-
-            /* Normalize vector such that w = 1 */
-            this.x = Vector.parseFloat (arguments[0]) / w;
-            this.y = Vector.parseFloat (arguments[1]) / w;
-            this.z = Vector.parseFloat (arguments[2]) / w;
-            this.w = 1;
-
-        } else {
-            throw new Error ('Invalid vector');
         }
 
     } else {
 
-        throw new Error ('Invalid vector');
+        /* Zero or many arguments provided */
+        args = arguments;
 
     }
+
+    /* Get x-coordinate from argument list */
+    var x;
+    if (typeof args[0] != 'undefined') {
+        x = Vector.parseFloat (args[0]);
+    } else if (typeof args.x != 'undefined') {
+        x = Vector.parseFloat (args.x);
+    } else {
+        x = 0;
+    }
+
+    /* Get y-coordinate */
+    var y;
+    if (typeof args[1] != 'undefined') {
+        y = Vector.parseFloat (args[1]);
+    } else if (typeof args.y != 'undefined') {
+        y = Vector.parseFloat (args.y);
+    } else {
+        y = 0;
+    }
+
+    /* Get z-coordinate */
+    var z;
+    if (typeof args[2] != 'undefined') {
+        z = Vector.parseFloat (args[2]);
+    } else if (typeof args.z != 'undefined') {
+        z = Vector.parseFloat (args.z);
+    } else {
+        z = 0;
+    }
+
+    /* Handle the w-coordinate component */
+    if (typeof args[3] != 'undefined'  ||  typeof args.w != 'undefined') {
+        var w;
+
+        /* Read w-coordinate from argument list */
+        if (typeof args[3] != 'undefined') {
+            w = Vector.parseFloat (args[3]);
+        } else if (typeof args.w != 'undefined') {
+            w = Vector.parseFloat (args.w);
+        } else {
+            throw new Error ('Missing w');
+        }
+
+        /* Avoid division by zero error */
+        if (Math.abs (w) > 1.0e-6) {
+
+            /* Normalize x, y and z-coordinate components such that w is 1 */
+            x /= w;
+            y /= w;
+            z /= w;
+
+        } else {
+            throw new Error ('Division by zero');
+        }
+
+    }
+
+    /* Store coordinate */
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.w = 1;
 }
 Vector.prototype = {};
 Vector.prototype.constructor = Vector;
+
+/*
+ * Convert argument to vector.
+ *
+ * The function expects to receive an indexed array, an associative array or
+ * a vector as an argument.
+ *
+ * The function returns a vector object.  If the argument was an array of some
+ * kind, then the result will be a new vector.  If the input argument was
+ * already a vector, then the very same object is returned as a result.  The
+ * function throws an exception if the input argument cannot be converted into
+ * a vector.
+ *
+ * @param mixed v Array or vector
+ * @return Vector
+ */
+Vector.getInstance = function (v) {
+    var r;
+
+    if (v) {
+        if (typeof v == 'object') {
+
+            if (v instanceof Vector) {
+
+                /* Argument is already vector, no conversion needed */
+                r = v;
+
+            } else {
+
+                /* Try to convert the argument to a vector */
+                r = new Vector (v);
+
+            }
+
+        } else {
+            /* Non-zero scalar argument */
+            throw new Error ('Invalid argument');
+        }
+    } else {
+        /* Null object or zero scalar argument */
+        throw new Error ('Invalid argument');
+    }
+    return r;
+};
 
 /*
  * Convert argument to floating point number.
@@ -129,7 +198,7 @@ Vector.parseFloat = function (value) {
             /* Convert to floating point number */
             r = parseFloat (value);
 
-            /* Make sure that the string could be expressed as number */
+            /* Make sure that the string can be expressed as a number */
             if (!isFinite (r)) {
                 throw new Error ('Invalid number ' + value);
             }
@@ -166,7 +235,7 @@ Vector.parseFloat = function (value) {
  *     // Create vector
  *     var v = new Vector (100, 50);
  *
- *     // Clone vector v
+ *     // Create duplicate of vector v
  *     var q = v.clone ();
  *
  * @return Vector
@@ -183,10 +252,12 @@ Vector.prototype.clone = function () {
 /**
  * Add two vectors.
  *
- * The function expects to receive the right-hand vector as an input argument.
+ * The function expects to receive the right-hand operand as an input.  The
+ * operand may be a vector object, an indexed array or an associative
+ * array with x, y, z and possibly w components.
  *
  * The function returns a new vector that contains the result of the addition.
- * Input argument or object are not modified by the operation.
+ * Input argument or source object are not modified by the operation.
  *
  * Example:
  *
@@ -200,10 +271,14 @@ Vector.prototype.clone = function () {
  *     // Output coordinate 110,90
  *     alert ('Vector v = ' + v.x + ',' + v.y);
  *
- * @param Vector b
+ * @param mixed b Right-hand operand (vector or array)
  * @return Vector
  */
 Vector.prototype.add = function (b) {
+    /* Convert argument to vector */
+    b = Vector.getInstance (b);
+
+    /* Add vectors */
     var r = new Vector(
         this.x + b.x,
         this.y + b.y,
@@ -215,16 +290,30 @@ Vector.prototype.add = function (b) {
 /**
  * Substract two vectors.
  *
- * The function expects to receive the right-hand vector as an input argument.
+ * The function expects to receive the right-hand operand as an input.  The
+ * input argument may be a vector object, an indexed array or an associative
+ * array with x, y, z and possibly w components.
  *
  * The function returns a new vector that contains the result of the
- * substraction.  Neither input argument or vector are modified in the
+ * substraction.  Neither input argument or source vector are modified in the
  * process.
  *
- * @param Vector b
+ * Example:
+ *
+ *     // Substract vector b from vector a producing vector v
+ *     v = a.sub (b);
+ *
+ *     // Substract temporary vector (1,0)
+ *     v = v.sub ([1, 0]);
+ *
+ * @param mixed b Right-hand operand (vector or array)
  * @return Vector
  */
 Vector.prototype.sub = function (b) {
+    /* Convert argument to vector */
+    b = Vector.getInstance (b);
+
+    /* Substract vectors */
     var r = new Vector(
         this.x - b.x,
         this.y - b.y,
@@ -270,7 +359,7 @@ Vector.prototype.mul = function (f) {
         );
 
     } else {
-        throw new Error ('Invalid argument ' + f);
+        throw new Error ('Invalid argument');
     }
     return r;
 };
@@ -278,8 +367,9 @@ Vector.prototype.mul = function (f) {
 /**
  * Compute the length of vector.
  *
- * The function accepts no input arguments.  The function returns the length
- * of the vector as a floating point number.
+ * The function accepts no input arguments.
+ *
+ * The function returns the length of the vector as a floating point number.
  *
  * Example:
  *
@@ -306,7 +396,8 @@ Vector.prototype.length = function () {
  * The function accepts no input arguments.
  *
  * The function returns a new vector that contains the result -- the source
- * object is not modified by the operation.
+ * object is not modified by the operation.  The function throws an exception
+ * if the source vector has no length.
  *
  * Example:
  *
@@ -370,15 +461,21 @@ Vector.prototype.neg = function () {
 /**
  * Compute cross product.
  *
- * The function expects to receive the right-hand vector as an input argument.
+ * The function expects to receive the right-hand operand as an input.  This
+ * operand may be a vector, an indexed array or an associative array with x,
+ * y, z and optional w components.
  *
  * The function returns a new vector that contains the result -- the source or
  * the argument vector are not modified.
  *
- * @param Vector b
+ * @param mixed b Right-hand operand (vector or array)
  * @return Vector
  */
 Vector.prototype.cross = function (b) {
+    /* Convert argument to vector */
+    b = Vector.getInstance (b);
+
+    /* Compute cross product */
     var r = new Vector(
         this.y * b.z - this.z * b.y,
         this.z * b.x - this.x * b.z,
@@ -390,15 +487,21 @@ Vector.prototype.cross = function (b) {
 /**
  * Compute dot product.
  *
- * The function expects to receive the right-hand vector as an input argument.
+ * The function expects to receive the right-hand operand as an input.  This
+ * operand may be a vector, an indexed array or an associative array with x,
+ * y, z and optional w components.
  *
  * The function returns a new vector that contains the result -- the source or
  * the argument vector are not modified.
  *
- * @param Vector b
+ * @param mixed b Right-hand operand (vector or array)
  * @return Vector
  */
 Vector.prototype.dot = function (b) {
+    /* Convert argument to vector */
+    b = Vector.getInstance (b);
+
+    /* Compute dot product */
     var r = new Vector(
         this.x * b.x,
         this.y * b.y,

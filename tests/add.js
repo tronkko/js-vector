@@ -48,5 +48,13 @@ Test.module ('Vector.add', function () {
         var v = a.add (a);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 2, 4, 6, 1 ]);
+
+    /* Operand can be given as an indexed array */
+    this.test ('add-130.0', function () {
+        var a = new Vector (1, 2, 3);
+        var v = a.add ([10, 20, 30]);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 11, 22, 33, 1 ]);
+
 });
 

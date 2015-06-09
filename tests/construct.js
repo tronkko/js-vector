@@ -89,22 +89,6 @@ Test.module ('Vector.construct', function () {
         return ok;
     });
 
-    /* Copy-construct fails with non-vector object */
-    this.test ('construct-132.0', function () {
-        var ok = false;
-        try {
-
-            /* Try to create a vector with an non-compatible object */
-            var v = new Vector ({ a: 123 });
-
-        }
-        catch (e) {
-            /* Got an exception as expected */
-            ok = true;
-        }
-        return ok;
-    });
-
     /* 
      * Construction from 3d-coordinate with the w component causes x, y and z
      * component to be altered.
@@ -146,6 +130,18 @@ Test.module ('Vector.construct', function () {
         /* Original coordinate can still be found from vector v */
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0.25, 0.5, 0.75, 1.0 ]);
+
+    /* Components of a vector can be given in an indexed array */
+    this.test ('construct-160.0', function () {
+        var v = new Vector ([1, 2, 3]);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 1, 2, 3, 1 ]);
+
+    /* Components of a vector can be given in an associative array */
+    this.test ('construct-161.0', function () {
+        var v = new Vector ({ x:1, y:2, z:3 });
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 1, 2, 3, 1 ]);
 
 });
 

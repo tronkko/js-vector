@@ -41,5 +41,18 @@ Test.module ('Vector.sub', function () {
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0, 0, 0, 1 ]);
 
+    /* Argument can be an indexed array */
+    this.test ('sub-170.0', function () {
+        var a = new Vector (10, 20, 30);
+        var v = a.sub ([ 1, 2, 3 ]);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 9, 18, 27, 1 ]);
+
+    /* Argument can be an associative array */
+    this.test ('sub-171.0', function () {
+        var a = new Vector (10, 20, 30);
+        var v = a.sub ({ x:1, y:2, z:3 });
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 9, 18, 27, 1 ]);
 });
 

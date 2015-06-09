@@ -53,5 +53,19 @@ Test.module ('Vector.dot', function () {
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1*1, 2*2, 3*3, 1 ]);
 
+    /* Argument can be supplied as an indexed array */
+    this.test ('dot-140.0', function () {
+        var a = new Vector (5, 0, 0);
+        var v = a.dot ([0, 0, 1]);
+        return v.length ();
+    }, 0);
+
+    /* Argument can be supplied as an associative array */
+    this.test ('dot-150.0', function () {
+        var a = new Vector (1, 2, 3);
+        var v = a.dot ({ x:1, y:2, z:3, w:1 });
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 1*1, 2*2, 3*3, 1 ]);
+
 });
 

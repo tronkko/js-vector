@@ -71,5 +71,12 @@ Test.module ('Vector.cross', function () {
         return v.length ();
     }, 0);
 
+    /* Argument can be supplied as an indexed array */
+    this.test ('cross-150.0', function () {
+        var a = new Vector (1, 0, 0);
+        var v = a.cross ([0, 1, 0]);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 0, 0, 1, 1 ]);
+
 });
 
