@@ -249,6 +249,11 @@ Vector.prototype.clone = function () {
     return r;
 };
 
+/* Alias */
+Vector.prototype.dup = function () {
+    return this.clone ();
+};
+
 /**
  * Add two vectors.
  *
@@ -359,8 +364,43 @@ Vector.prototype.mul = function (f) {
         );
 
     } else {
-        throw new Error ('Invalid argument');
+        throw new Error ('Invalid number');
     }
+    return r;
+};
+
+/**
+ * Divide vector by number.
+ *
+ * The function expects to receive a single number as an input argument.
+ *
+ * The function returns a new vector that contains the result of the
+ * multiplication -- the source object is not modified by the operation.
+ *
+ * @param float f
+ * @return Vector
+ */
+Vector.prototype.div = function (f) {
+    var r;
+
+    /* Make sure that argument is a valid number */
+    var value = Vector.parseFloat (f);
+    if (isFinite (value)) {
+
+        /* Check against division by zero */
+        if (Math.abs (value) > 1.0e-6) {
+
+            /* Multiply with inverse number */
+            r = this.mul (1.0 / value);
+
+        } else {
+            throw new Error ('Division by zero');
+        }
+
+    } else {
+        throw new Error ('Invalid number');
+    }
+
     return r;
 };
 
@@ -388,6 +428,11 @@ Vector.prototype.length = function () {
         + this.z * this.z
     );
     return r;
+};
+
+/* Alias */
+Vector.prototype.len = function () {
+    return this.length ();
 };
 
 /**
@@ -433,8 +478,10 @@ Vector.prototype.normalize = function () {
  *
  * The function accepts no input arguments.
  *
- * The function returns a new vector object that contains the result of the
- * negation -- the source object is not modified.
+ * The function returns a new vector that contains the result of the
+ * negation -- the source object is not modified.  If the source object is a
+ * zero-length vector, then the function will return a new zero-length
+ * vector.
  *
  * Example:
  *
