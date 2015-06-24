@@ -14,58 +14,64 @@ Test.module ('Vector.dot', function () {
     this.test ('dot-100.0', function () {
         var a = new Vector (3, 0, 0);
         var b = new Vector (0, 1, 0);
-        var v = a.dot (b);
-        return v.length ();
+        a.dot (b);
+        return a.len ();
     }, 0);
     this.test ('dot-101.0', function () {
         var a = new Vector (0, 2, 0);
         var b = new Vector (0, 0, 6);
-        var v = a.dot (b);
-        return v.length ();
+        a.dot (b);
+        return a.len ();
     }, 0);
     this.test ('dot-102.0', function () {
         var a = new Vector (5, 0, 0);
         var b = new Vector (0, 0, 1);
-        var v = a.dot (b);
-        return v.length ();
+        a.dot (b);
+        return a.len ();
     }, 0);
 
-    /* Left-hand operand is not affected by the operation */
-    this.test ('dot-110.0', function () {
-        var a = new Vector (5, 0, 0);
-        var b = new Vector (0, 0, 1);
-        var v = a.dot (b);
-        return [ a.x, a.y, a.z, a.w ];
-    }, [ 5, 0, 0, 1 ]);
-
-    /* Right-hand operand is not affected by the operation */
-    this.test ('dot-120.0', function () {
-        var a = new Vector (5, 0, 0);
-        var b = new Vector (0, 0, 1);
-        var v = a.dot (b);
-        return [ b.x, b.y, b.z, b.w ];
-    }, [ 0, 0, 1, 1 ]);
-
-    /* Dot product of vector itself */
+    /* Dot product of vector itself is same as squaring each component */
     this.test ('dot-130.0', function () {
         var a = new Vector (1, 2, 3);
-        var v = a.dot (a);
-        return [ v.x, v.y, v.z, v.w ];
+        a.dot (a);
+        return [ a.x, a.y, a.z, a.w ];
     }, [ 1*1, 2*2, 3*3, 1 ]);
 
     /* Argument can be supplied as an indexed array */
     this.test ('dot-140.0', function () {
         var a = new Vector (5, 0, 0);
-        var v = a.dot ([0, 0, 1]);
-        return v.length ();
+        a.dot ([0, 0, 1]);
+        return a.len ();
     }, 0);
 
     /* Argument can be supplied as an associative array */
     this.test ('dot-150.0', function () {
         var a = new Vector (1, 2, 3);
-        var v = a.dot ({ x:1, y:2, z:3, w:1 });
+        a.dot ({ x:1, y:2, z:3, w:1 });
+        return [ a.x, a.y, a.z, a.w ];
+    }, [ 1*1, 2*2, 3*3, 1 ]);
+
+    /* Vector.dot can compute dot product between two arrays */
+    this.test ('dot-160.0', function () {
+        var v = Vector.dot ([ 1,2,3 ],[ 1,2,3 ]);
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1*1, 2*2, 3*3, 1 ]);
+
+    /* Vector.dot does not modify left-hand operand */
+    this.test ('dot-170.0', function () {
+        var a = new Vector (5, 0, 0);
+        var b = new Vector (0, 0, 1);
+        var v = Vector.dot (a, b);
+        return [ a.x, a.y, a.z, a.w ];
+    }, [ 5, 0, 0, 1 ]);
+
+    /* Vector.dot does not modify right-hand operand */
+    this.test ('dot-180.0', function () {
+        var a = new Vector (5, 0, 0);
+        var b = new Vector (0, 0, 1);
+        var v = Vector.dot (a, b);
+        return [ b.x, b.y, b.z, b.w ];
+    }, [ 0, 0, 1, 1 ]);
 
 });
 

@@ -13,15 +13,15 @@ Test.module ('Vector.div', function () {
     /* Division with 1 changes nothing */
     this.test ('div-100.0', function () {
         var a = new Vector (1, 2, 3);
-        var v = a.div (1.0);
-        return [ v.x, v.y, v.z, v.w ];
+        a.div (1.0);
+        return [ a.x, a.y, a.z, a.w ];
     }, [ 1, 2, 3, 1 ]);
 
     /* Basic division with number */
     this.test ('div-110.0', function () {
         var a = new Vector (1, 2, 3);
-        var v = a.div (10);
-        return [ v.x, v.y, v.z, v.w ];
+        a.div (10);
+        return [ a.x, a.y, a.z, a.w ];
     }, [ 0.1, 0.2, 0.3, 1 ]);
 
     /* Vector can only be divided by a number */
@@ -34,7 +34,7 @@ Test.module ('Vector.div', function () {
             var b = new Vector (2, 3, 4);
 
             /* Attempt to divide vectors */
-            var v = a.div (b);
+            a.div (b);
 
         }
         catch (e) {
@@ -53,7 +53,7 @@ Test.module ('Vector.div', function () {
             var a = new Vector (1, 2, 3);
 
             /* Attempt to divide vector with invalid number */
-            var v = a.div ('12aza');
+            a.div ('12aza');
 
         }
         catch (e) {
@@ -63,12 +63,18 @@ Test.module ('Vector.div', function () {
         return ok;
     });
 
-    /* Division does not modify source vector */
+    /* Vector.div does not modify the source vector */
     this.test ('div-130.0', function () {
         var a = new Vector (1, 2, 3);
-        var v = a.div (10);
+        var v = Vector.div (a, 10);
         return [ a.x, a.y, a.z, a.w ];
     }, [ 1, 2, 3, 1 ]);
+
+    /* Vector.div can divide any array */
+    this.test ('div-140.0', function () {
+        var v = Vector.div ([ 1, 2, 3 ], 10);
+        return [ v.x, v.y, v.z, v.w ];
+    }, [ 0.1, 0.2, 0.3, 1 ]);
 
 });
 

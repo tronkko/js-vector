@@ -1,5 +1,5 @@
 /*
- * vector.js
+ * vector.js 1.0
  * Vector and Matrix math on JavaScript
  * 
  * Copyright (c) 2015 Toni Ronkko
@@ -116,13 +116,52 @@ function Vector (/*args*/) {
     }
 
     /* Store coordinate */
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = 1;
+    this[0] = x;
+    this[1] = y;
+    this[2] = z;
+    this[3] = 1;
 }
 Vector.prototype = {};
 Vector.prototype.constructor = Vector;
+
+/* Access elements of vector through variables x, y, z and w */
+Object.defineProperty (Vector.prototype, 'x', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return this[0];
+    },
+});
+Object.defineProperty (Vector.prototype, 'y', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return this[1];
+    },
+});
+Object.defineProperty (Vector.prototype, 'z', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return this[2];
+    },
+});
+Object.defineProperty (Vector.prototype, 'w', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return this[3];
+    },
+});
+
+/* Access dimension of vector through length property */
+Object.defineProperty (Vector.prototype, 'length', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return 4;
+    },
+});
 
 /*
  * Convert argument to vector.
@@ -132,9 +171,18 @@ Vector.prototype.constructor = Vector;
  *
  * The function returns a vector object.  If the argument was an array of some
  * kind, then the result will be a new vector.  If the input argument was
- * already a vector, then the very same object is returned as a result.  The
- * function throws an exception if the input argument cannot be converted into
- * a vector.
+ * already a vector, then the very same object is returned as a result.  If
+ * the input argument cannot be converted into a vector, then the function
+ * throws an exception.
+ *
+ * Example:
+ *
+ *     // Get existing object
+ *     var v = new Vector (1, 0, 0);
+ *     var q = Vector.getInstance (v);
+ *
+ *     // Create new object
+ *     var q = Vector.getInstance ([ 1, 0, 0 ]);
  *
  * @param mixed v Array or vector
  * @return Vector
@@ -177,6 +225,11 @@ Vector.getInstance = function (v) {
  * The function returns floating point number.  If the argument cannot be
  * converted to a floating point number, then the function throws an
  * exception.
+ *
+ * Example:
+ *
+ *     // Returns 1.5
+ *     var f = Vector.parseFloat ('1.5');
  *
  * @param mixed value
  * @return float
@@ -227,8 +280,8 @@ Vector.parseFloat = function (value) {
  *
  * The function accepts no arguments.
  *
- * The function returns a new Vector object that contains the copy of the
- * coordinate.
+ * The function returns a new Vector object that contains copy of the
+ * coordinate components.
  *
  * Example:
  *
@@ -241,12 +294,13 @@ Vector.parseFloat = function (value) {
  * @return Vector
  */
 Vector.prototype.clone = function () {
-    var r = new Vector(
-        this.x,
-        this.y,
-        this.z
-    );
-    return r;
+    return new Vector (this);
+};
+
+/* Alias */
+Vector.clone = function (v) {
+    v = Vector.getInstance (v);
+    return v.clone ();
 };
 
 /* Alias */
@@ -254,15 +308,21 @@ Vector.prototype.dup = function () {
     return this.clone ();
 };
 
+/* Alias */
+Vector.dup = function (v) {
+    v = Vector.getInstance (v);
+    return v.dup ();
+};
+
 /**
- * Add two vectors.
+ * Add vector.
  *
- * The function expects to receive the right-hand operand as an input.  The
+ * The function expects to receive the right-hand operand as an input.  This
  * operand may be a vector object, an indexed array or an associative
  * array with x, y, z and possibly w components.
  *
- * The function returns a new vector that contains the result of the addition.
- * Input argument or source object are not modified by the operation.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which may be used for chaining mathematical operations.
  *
  * Example:
  *
@@ -270,46 +330,73 @@ Vector.prototype.dup = function () {
  *     var a = new Vector (100, 100);
  *     var b = new Vector (10, -10);
  *
- *     // Add vectors a and b producing vector v
- *     var v = a.add (b);
+ *     // Add vector b and store the result to vector a
+ *     a.add (b);
  *
- *     // Output coordinate 110,90
- *     alert ('Vector v = ' + v.x + ',' + v.y);
+ *     // Output updated vector a, now (110,90)
+ *     alert ('Vector a = ' + a.x + ',' + a.y);
  *
  * @param mixed b Right-hand operand (vector or array)
  * @return Vector
  */
 Vector.prototype.add = function (b) {
     /* Convert argument to vector */
-    b = Vector.getInstance (b);
+    var operand = Vector.getInstance (b);
 
-    /* Add vectors */
-    var r = new Vector(
-        this.x + b.x,
-        this.y + b.y,
-        this.z + b.z
-    );
-    return r;
+    /* Add vector */
+    this[0] += operand[0];
+    this[1] += operand[1];
+    this[2] += operand[2];
+    return this;
 };
 
 /**
- * Substract two vectors.
+ * Add two vectors.
+ *
+ * The function expects to receive two vectors (or arrays convertible to
+ * vectors) as input arguments.
+ *
+ * The function returns a new vector that contains the result of the addition.
+ * No source operand is modified in the process.
+ *
+ * Example:
+ *
+ *     // Construct vectors a and b
+ *     var a = new Vector (100, 100);
+ *     var b = new Vector (10, -10);
+ *
+ *     // Add vectors a and b storing the result to vector v
+ *     var v = Vector.add (a, b);
+ *
+ *     // Output coordinate 110,90
+ *     alert ('Vector a = ' + v.x + ',' + v.y);
+ *
+ * @param mixed a Left-hand operand (vector or array)
+ * @param mixed b Right-hand operand (vector or array)
+ * @return Vector
+ */
+Vector.add = function (a, b) {
+    var dup = new Vector (a);
+    return dup.add (b);
+};
+
+/**
+ * Substract vector.
  *
  * The function expects to receive the right-hand operand as an input.  The
  * input argument may be a vector object, an indexed array or an associative
  * array with x, y, z and possibly w components.
  *
- * The function returns a new vector that contains the result of the
- * substraction.  Neither input argument or source vector are modified in the
- * process.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which may be used for chaining mathematical operations.
  *
  * Example:
  *
- *     // Substract vector b from vector a producing vector v
- *     v = a.sub (b);
+ *     // Substract b from vector a
+ *     a.sub (b);
  *
- *     // Substract temporary vector (1,0)
- *     v = v.sub ([1, 0]);
+ *     // Substract temporary vector (1,0) from vector v
+ *     v.sub ([1, 0]);
  *
  * @param mixed b Right-hand operand (vector or array)
  * @return Vector
@@ -318,13 +405,34 @@ Vector.prototype.sub = function (b) {
     /* Convert argument to vector */
     b = Vector.getInstance (b);
 
-    /* Substract vectors */
-    var r = new Vector(
-        this.x - b.x,
-        this.y - b.y,
-        this.z - b.z
-    );
-    return r;
+    /* Substract vector */
+    this[0] -= b[0];
+    this[1] -= b[1];
+    this[2] -= b[2];
+    return this;
+};
+
+/**
+ * Substract two vectors.
+ *
+ * The function expects to receive two vectors (or arrays convertible to
+ * vectors) as input arguments.
+ *
+ * The function returns a new vector that contains the result of the
+ * substraction.  No source operand is modified in the process.
+ *
+ * Example:
+ *
+ *     // Substract vectors p and q storing the result to v
+ *     var v = Vector.sub (p, q);
+ *
+ * @param mixed a Left-hand operand (vector or array)
+ * @param mixed b Right-hand operand (vector or array)
+ * @return Vector
+ */
+Vector.sub = function (a, b) {
+    var dup = new Vector (a);
+    return dup.sub (b);
 };
 
 /**
@@ -332,8 +440,8 @@ Vector.prototype.sub = function (b) {
  *
  * The function expects to receive a single number as an input argument.
  *
- * The function returns a new vector that contains the result of the
- * multiplication -- the source object is not modified by the operation.
+ * The function updates 'this' vector and returns a reference to 'this' object
+ * which may be used for chaining mathematical operations.
  *
  * Example:
  *
@@ -341,10 +449,10 @@ Vector.prototype.sub = function (b) {
  *     var q = new Vector (1, 2);
  *
  *     // Multiply vector q by 10
- *     var v = q.mul (10);
+ *     q.mul (10);
  *
  *     // Output coordinate 10,20
- *     alert ('Vector v = ' + v.x + ',' + v.y);
+ *     alert ('Vector q = ' + q.x + ',' + q.y);
  *
  * @param float f
  * @return Vector
@@ -354,54 +462,82 @@ Vector.prototype.mul = function (f) {
 
     /* Ensure that argument is a valid number */
     var value = Vector.parseFloat (f);
-    if (isFinite (value)) {
 
-        /* Create new vector */
-        r = new Vector(
-            this.x * value,
-            this.y * value,
-            this.z * value
-        );
-
-    } else {
-        throw new Error ('Invalid number');
-    }
-    return r;
+    /* Multiply vector */
+    this[0] *= value;
+    this[1] *= value;
+    this[2] *= value;
+    return this;
 };
 
 /**
- * Divide vector by number.
+ * Multiply vector and a number.
+ *
+ * The function expects to receive a vector (or array convertible to vector)
+ * as the first input argument and a scalar number as the second input
+ * argument.
+ *
+ * The function returns a new vector that contains the result of the
+ * multiplication.  No input operands are modified in the process.
+ *
+ * Example:
+ *
+ *     // Create vector q that is multiple of vector v
+ *     var q = Vector.mul (v, 10);
+ *
+ * @param mixed a Left-hand operand (vector or array)
+ * @param float f Right-hand operand
+ * @return Vector
+ */
+Vector.mul = function (a, f) {
+    var dup = new Vector (a);
+    return dup.mul (f);
+};
+
+/**
+ * Divide vector by a number.
  *
  * The function expects to receive a single number as an input argument.
  *
- * The function returns a new vector that contains the result of the
- * multiplication -- the source object is not modified by the operation.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which may be used for chaining mathematical operations.
  *
  * @param float f
  * @return Vector
  */
 Vector.prototype.div = function (f) {
-    var r;
-
     /* Make sure that argument is a valid number */
     var value = Vector.parseFloat (f);
-    if (isFinite (value)) {
 
-        /* Check against division by zero */
-        if (Math.abs (value) > 1.0e-6) {
+    /* Check against division by zero */
+    if (Math.abs (value) > 1.0e-6) {
 
-            /* Multiply with inverse number */
-            r = this.mul (1.0 / value);
-
-        } else {
-            throw new Error ('Division by zero');
-        }
+        /* Multiply with inverse number */
+        this.mul (1.0 / value);
 
     } else {
-        throw new Error ('Invalid number');
+        throw new Error ('Division by zero');
     }
+    return this;
+};
 
-    return r;
+/**
+ * Divide vector and a number.
+ *
+ * The function expects to receive a vector (or array convertible to vector)
+ * as the first input argument and a scalar number as the second input
+ * argument.
+ *
+ * The function returns a new vector that contains the result of the
+ * division.  No input operands are modified in the process.
+ *
+ * @param mixed a Left-hand operand (vector or array)
+ * @param float f Right-hand operand
+ * @return Vector
+ */
+Vector.div = function (a, f) {
+    var dup = new Vector (a);
+    return dup.div (f);
 };
 
 /**
@@ -417,32 +553,32 @@ Vector.prototype.div = function (f) {
  *     var v = new Vector (100, 100);
  *
  *     // Output 141.42
- *     alert ('len=' + v.length ());
+ *     alert ('len=' + v.len ());
  *
  * @return float
  */
-Vector.prototype.length = function () {
-    var r = Math.sqrt(
-        this.x * this.x
-        + this.y * this.y
-        + this.z * this.z
+Vector.prototype.len = function () {
+    var f = Math.sqrt(
+        this[0] * this[0]
+        + this[1] * this[1]
+        + this[2] * this[2]
     );
-    return r;
+    return f;
 };
 
 /* Alias */
-Vector.prototype.len = function () {
-    return this.length ();
+Vector.len = function (a) {
+    var v = Vector.getInstance (a);
+    return v.len ();
 };
 
 /**
- * Return a new vector with length of unity.
+ * Normalize vector's length.
  *
  * The function accepts no input arguments.
  *
- * The function returns a new vector that contains the result -- the source
- * object is not modified by the operation.  The function throws an exception
- * if the source vector has no length.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which can be used for chaining mathematical operations.
  *
  * Example:
  *
@@ -450,9 +586,9 @@ Vector.prototype.len = function () {
  *     var v = new Vector (100, 100);
  *
  *     // Normalize vector
- *     v = v.normalize ();
+ *     v.normalize ();
  *
- *     // Output coordinate 0.7071,0.7071
+ *     // Output normalized coordinate 0.7071,0.7071
  *     alert ('Vector v = ' + v.x + ',' + v.y);
  *
  * @return Vector
@@ -461,16 +597,43 @@ Vector.prototype.normalize = function () {
     var r;
 
     /* Compute length of vector */
-    var f = this.length ();
+    var f = this.len ();
     if (f > 1.0e-6) {
 
         /* Construct new vector with length of 1 */
-        r = this.mul (1.0 / f);
+        this.mul (1.0 / f);
 
     } else {
         throw new Error ('Zero-length vector');
     }
-    return r;
+    return this;
+};
+
+/**
+ * Create normalized vector.
+ *
+ * The function expects to receive a vector (or array convertible to vector)
+ * as an input argument.
+ *
+ * The function returns a new vector object that contains the normalized
+ * vector.  The source operand is not modified in the process.
+ *
+ * Example:
+ *
+ *     // Construct vector v
+ *     var v = new Vector (100, 100);
+ *
+ *     // Create normalized version of v without changing v
+ *     var q = Vector.normalize (v);
+ *
+ *     // Output normalized coordinate 0.7071,0.7071
+ *     alert ('Vector q = ' + q.x + ',' + q.y);
+ *
+ * @return Vector
+ */
+Vector.normalize = function (a) {
+    var dup = new Vector (a);
+    return dup.normalize ();
 };
 
 /**
@@ -478,10 +641,8 @@ Vector.prototype.normalize = function () {
  *
  * The function accepts no input arguments.
  *
- * The function returns a new vector that contains the result of the
- * negation -- the source object is not modified.  If the source object is a
- * zero-length vector, then the function will return a new zero-length
- * vector.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which can be used for chaining mathematical operations.
  *
  * Example:
  *
@@ -489,20 +650,45 @@ Vector.prototype.normalize = function () {
  *     var v = new Vector (100, 100);
  *
  *     // Negate vector
- *     v = v.neg ();
+ *     v.neg ();
  *
- *     // Output coordinate -100,-100
+ *     // Output negated coordinate -100,-100
  *     alert ('Vector v = ' + v.x + ',' + v.y);
  *
  * @return Vector
  */
 Vector.prototype.neg = function () {
-    var r = new Vector(
-        -this.x,
-        -this.y,
-        -this.z
-    );
-    return r;
+    this[0] = -this[0];
+    this[1] = -this[1];
+    this[2] = -this[2];
+    return this;
+};
+
+/**
+ * Create negated vector.
+ *
+ * The function expects to receive a vector (or array convertible to vector)
+ * as an input argument.
+ *
+ * The function returns a new vector that contains the result of the
+ * negation.  The source object is not modified.
+ *
+ * Example:
+ *
+ *     // Construct vector
+ *     var v = new Vector (100, 100);
+ *
+ *     // Create negated vector q without chaning v
+ *     var q = Vector.neg (v);
+ *
+ *     // Output negated coordinate -100,-100
+ *     alert ('Vector q = ' + q.x + ',' + q.y);
+ *
+ * @return Vector
+ */
+Vector.neg = function (a) {
+    var dup = new Vector (a);
+    return dup.neg ();
 };
 
 /**
@@ -512,8 +698,8 @@ Vector.prototype.neg = function () {
  * operand may be a vector, an indexed array or an associative array with x,
  * y, z and optional w components.
  *
- * The function returns a new vector that contains the result -- the source or
- * the argument vector are not modified.
+ * The function stores the result to 'this' object and returns a reference to
+ * 'this' object which may be used for chaining mathematical operations.
  *
  * @param mixed b Right-hand operand (vector or array)
  * @return Vector
@@ -522,13 +708,40 @@ Vector.prototype.cross = function (b) {
     /* Convert argument to vector */
     b = Vector.getInstance (b);
 
-    /* Compute cross product */
-    var r = new Vector(
-        this.y * b.z - this.z * b.y,
-        this.z * b.x - this.x * b.z,
-        this.x * b.y - this.y * b.x
-    );
-    return r;
+    /* 
+     * Compute cross product into temporary variables.  Use of temporary
+     * variables prevents overwriting the source operand too soon and also
+     * allows the function to work correctly if input argument b is aliased
+     * to 'this'.
+     */
+    var rx = this[1] * b[2] - this[2] * b[1];
+    var ry = this[2] * b[0] - this[0] * b[2];
+    var rz = this[0] * b[1] - this[1] * b[0];
+
+    /* Store final result to 'this' object */
+    this[0] = rx;
+    this[1] = ry;
+    this[2] = rz;
+
+    return this;
+};
+
+/**
+ * Compute cross product between two vectors.
+ *
+ * The function expects to receive two vectors (or arrays convertible to
+ * vectors) as input arguments.
+ *
+ * The function returns a new vector that contains the result.  The source
+ * operands are not modified in the process.
+ *
+ * @param mixed a Left-hand operand (vector or array)
+ * @param mixed b Right-hand operand (vector or array)
+ * @return Vector
+ */
+Vector.cross = function (a, b) {
+    var dup = new Vector (a);
+    return dup.cross (b);
 };
 
 /**
@@ -538,8 +751,8 @@ Vector.prototype.cross = function (b) {
  * operand may be a vector, an indexed array or an associative array with x,
  * y, z and optional w components.
  *
- * The function returns a new vector that contains the result -- the source or
- * the argument vector are not modified.
+ * The function updates 'this' object and returns a reference to 'this' object
+ * which may be used for chaining mathematical operations.
  *
  * @param mixed b Right-hand operand (vector or array)
  * @return Vector
@@ -549,11 +762,28 @@ Vector.prototype.dot = function (b) {
     b = Vector.getInstance (b);
 
     /* Compute dot product */
-    var r = new Vector(
-        this.x * b.x,
-        this.y * b.y,
-        this.z * b.z
-    );
-    return r;
+    this[0] *= b[0];
+    this[1] *= b[1];
+    this[2] *= b[2];
+    return this;
 };
+
+/**
+ * Compute dot product.
+ *
+ * The function expects to receive the right-hand operand as an input.  This
+ * operand may be a vector, an indexed array or an associative array with x,
+ * y, z and optional w components.
+ *
+ * The function returns a new vector that contains the result.  No source
+ * arguments are modified in the process.
+ *
+ * @param mixed b Right-hand operand (vector or array)
+ * @return Vector
+ */
+Vector.dot = function (a, b) {
+    var dup = new Vector (a);
+    return dup.dot (b);
+};
+
 

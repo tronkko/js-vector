@@ -60,6 +60,12 @@ Test.module ('Vector.construct', function () {
         return ok;
     });
 
+    /* Components of the coordinate can be accessed using array notation */
+    this.test ('construct-112.0', function () {
+        var v = new Vector (1, 2, 3);
+        return [ v[0], v[1], v[2], v[3] ];
+    }, [ 1, 2, 3, 1 ]);
+
     /* Construct zero-length vector */
     this.test ('construct-120.0', function () {
         var v = new Vector ();

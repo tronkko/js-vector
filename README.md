@@ -13,34 +13,27 @@ var vz = bz - az;
 ```
 With the Vector class, you can do the same as:
 ```
-var v = a.sub (b);
+var v = Vector.sub (a, b);
 ```
 
 If you need the x, y or z coordinate components, you can
-access them easily through the member variables `v.x`, `v.y` and `v.z`.  For
-example, you could print a vector as
+access them easily through the member variables `v.x`, `v.y` and `v.z` or
+using the array syntax.  For example, you could print the components of
+vector `v` using member variables as
 ```
 alert ('v=[' + v.x + ',' + v.y + ',' v.z + ']');
 ```
-`
-
-# Using Js-vector in Your Own Projects
-
-To use the Vector class in your own projects, copy the file `js/vector.js`
-to your project and source it from HTML as
+or using the array syntax
 ```
-<script src="js/vector.js"></script>
+alert ('v=[' + v[0] + ',' + v[1] + ',' v[2] + ']');
 ```
-
-Js-vector may be freely distributed under the MIT license.
 
 
 # Vector Class
 
 ## Constructing Vectors
 
-At first, you will need to construct some vectors that you can
-compute later.  A vector is constructed from 2d or 3d coordinate simply
+A vector is constructed from 2d or 3d coordinate simply
 by providing the x, y and z components as parameters to the constructor.
 For example, construct 2d vector (1,2) as
 ```
@@ -57,37 +50,41 @@ var v = new Vector (100, 5, 4);
 Once you have constructed one or more vector objects, you can use the
 following mathematical operations to compute them:
 
-    * Addition: `c = a.add (b);`
-    * Substraction: `c = a.sub (b);`
-    * Multiplication: `c = a.mul (f);`
-    * Division: `c = a.div (f);`
-    * Length: `f = a.length ();`
-    * Normalization: `c = a.normalize ();`
-    * Negation: `c = a.neg ();`
-    * Cross product: `c = a.cross (b);`
-    * Dot product: `c = a.dot (b);`
+    * Addition: `c = Vector.add (a, b);`
+    * Substraction: `c = Vector.sub (a, b);`
+    * Multiplication: `c = Vector.mul (a, f);`
+    * Division: `c = Vector.div (a, f);`
+    * Length: `f = Vector.length (a);`
+    * Normalization: `c = Vector.normalize (a);`
+    * Negation: `c = Vector.neg (a);`
+    * Cross product: `c = Vector.cross (a, b);`
+    * Dot product: `c = Vector.dot (a, b);`
 
-Variables `a`, `b` and `c` represent vectors while `f` represents a
+where variables `a`, `b` and `c` represent vectors while `f` represents a
 floating point number.
 
-Be ware that Js-vector will never modify source or parameter vector.  This
-allows you to build complicated calculations without
-creating temporary vectors just to avoid overwriting real vectors.
-For example, you could compute the distance between points `p` and `q` as
+The above operations will never modify a parameter vector.  This allows
+you to build complicated calculations without creating temporary vectors
+explicitly.  For example, you can compute the distance between
+points `p` and `q` simply as
 ```
-var distance = p.sub (q).length ();
+var distance = Vector.length (Vector.sub (p, q));
 ```
-and avoid modifying the vector `p` by accident.
+without modifying the vector `p` by accident.
 
-If you do wish to modify a vector, then
-be sure to assign the result back to the variable or else the result
-will be discarded.  For example, to update position vector `p` with the
-direction vector `d`, you might write
+If you do wish to modify a vector, then assign the result to a variable
+or use object versions of the above operations.  For example, to update
+position vector `p` with the direction vector `d`, you might assign the
+result back to vector `p` as
 ```
-p = p.add (d.mul (speed));
+p = Vector.add (p, Vector.mul (d, speed));
+```
+or modify the vector `p` directly as
+```
+p.add (Vector.mul (d, speed));
 ```
 Naturally, you don't need to assign the result to a variable immediately but
-you can use the result for some more computation.
+you can chain mathematical operations.
 
 
 
@@ -98,7 +95,7 @@ then you can duplicate vectors the `new` operation:
 ```
 var dup = new Vector (source);
 ```
-or clone function:
+or clone function
 ```
 var dup = source.clone ();
 ```
@@ -116,13 +113,13 @@ var v = new Vector ({ x:1, y:2, z:3 });
 
 The array representation is especially useful in computation as it allows
 you to create temporary vectors easily.  For example, instead of creating
-vector (1,0,0) explicitly in
+vector (1,0,0) explicitly as in
 ```
-v = v.add (new Vector (1, 0, 0));
+v.add (new Vector (1, 0, 0));
 ```
-you can do the same calculation with less code by using an array
+you simply use an array
 ```
-v = v.add ([ 1, 0, 0 ]);
+v.add ([ 1, 0, 0 ]);
 ```
 
 
@@ -134,14 +131,25 @@ turn.
 
 Some notable functions which may fail with an exception include:
 
-    * Division: `v.div (f)` will fail if `f` is zero
-    * Normalization: `x.normalize()` will fail if `x` is a zero-length vector
+    * Division: `div (f)` will fail if `f` is zero
+    * Normalization: `normalize (x)` will fail if `x` is a zero-length vector
+
+
+# Using Js-vector in Your Own Projects
+
+To use the Vector class in your own projects, copy the file `js/vector.js`
+to your project and source it from HTML as
+```
+<script src="js/vector.js"></script>
+```
+
+Js-vector may be freely distributed under the MIT license.
 
 
 # Alternatives to Js-vector
 
 While Js-vector is a small and useful library, there are
-also other more comprehensive and better optimized math libraries for
+other more comprehensive and better optimized math libraries for
 JavaScript.  For example, [Sylvester](http://sylvester.jcoglan.com/) and
 [glMatrix](http://glmatrix.net/) both contain rich set of functions
 for 2d and 3d math.
