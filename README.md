@@ -50,15 +50,15 @@ var v = new Vector (100, 5, 4);
 Once you have constructed one or more vector objects, you can use the
 following mathematical operations to compute them:
 
-    * Addition: `c = Vector.add (a, b);`
-    * Substraction: `c = Vector.sub (a, b);`
-    * Multiplication: `c = Vector.mul (a, f);`
-    * Division: `c = Vector.div (a, f);`
-    * Length: `f = Vector.length (a);`
-    * Normalization: `c = Vector.normalize (a);`
-    * Negation: `c = Vector.neg (a);`
-    * Cross product: `c = Vector.cross (a, b);`
-    * Dot product: `c = Vector.dot (a, b);`
+  * Addition: `c = Vector.add (a, b);`
+  * Substraction: `c = Vector.sub (a, b);`
+  * Multiplication: `c = Vector.mul (a, f);`
+  * Division: `c = Vector.div (a, f);`
+  * Length: `f = Vector.length (a);`
+  * Normalization: `c = Vector.normalize (a);`
+  * Negation: `c = Vector.neg (a);`
+  * Cross product: `c = Vector.cross (a, b);`
+  * Dot product: `c = Vector.dot (a, b);`
 
 where variables `a`, `b` and `c` represent vectors while `f` represents a
 floating point number.
@@ -131,8 +131,8 @@ turn.
 
 Some notable functions which may fail with an exception include:
 
-    * Division: `div (f)` will fail if `f` is zero
-    * Normalization: `normalize (x)` will fail if `x` is a zero-length vector
+  * Division: `div (f)` will fail if `f` is zero
+  * Normalization: `normalize (x)` will fail if `x` is a zero-length vector
 
 
 # Using Js-vector in Your Own Projects
