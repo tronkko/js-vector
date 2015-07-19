@@ -149,5 +149,17 @@ Test.module ('Vector.construct', function () {
         return [ v.x, v.y, v.z, v.w ];
     }, [ 1, 2, 3, 1 ]);
 
+    /* Vector inherits from VectorMath */
+    this.test ('construct-170.0', function () {
+        var ok;
+        var v = new Vector ({ x:1, y:2, z:3 });
+        if (v instanceof VectorMath) {
+            ok = true;
+        } else {
+            ok = false;
+        }
+        return ok;
+    });
+
 });
 

@@ -8,6 +8,169 @@
  * https://github.com/tronkko/js-vector
  */
 
+/* Base class */
+function VectorMath () {
+}
+VectorMath.prototype = {};
+VectorMath.prototype.constructor = VectorMath;
+
+/*
+ * Convert argument to floating point number.
+ *
+ * The function expects to receive a string or floating point argument as an
+ * input.
+ *
+ * The function returns floating point number.  If the argument cannot be
+ * converted to a floating point number, then the function throws an
+ * exception.
+ *
+ * Example:
+ *
+ *     // Returns 1.5
+ *     var f = VectorMath.parseFloat ('1.5');
+ *
+ * @param mixed value
+ * @return float
+ */
+VectorMath.parseFloat = function (value) {
+    var r;
+
+    var type = typeof value;
+    switch (type) {
+    case 'number':
+        /* Argument is already a number, no conversion needed */
+        r = value;
+        break;
+
+    case 'string':
+        /* Convert from string */
+        if (/^(\-|\+)?([0-9]+(\.[0-9]+)?)$/.test (value)) {
+
+            /* Convert to floating point number */
+            r = parseFloat (value);
+
+            /* Make sure that the string can be expressed as a number */
+            if (!isFinite (r)) {
+                throw new Error ('Invalid number ' + value);
+            }
+
+        } else {
+            /* Invalid number format, e.g. "12x" */
+            throw new Error ('Invalid number ' + value);
+        }
+
+        break;
+
+    case 'boolean':
+    case 'object':
+    case 'undefined':
+    case 'function':
+    default:
+        /* No conversion possible */
+        throw new Error ('Invalid data type ' + type);
+    }
+
+    return r;
+};
+
+/**
+ * Convert value to array of 4.
+ *
+ * Example:
+ *
+ *     // Returns [ 1, 2, 0, 1 ]
+ *     var x = VectorMath.getArray ([ 1, 2 ], 1);
+ *
+ * @param mixed value Value to convert
+ * @param float w Default value of fourth component
+ * @return array
+ */
+VectorMath.getArray = function (value, w) {
+    /* Convert value to array (if not already) */
+    var args;
+    if (value.length == 1) {
+
+        /* Value is array of one => convert */
+        args = value[0];
+        if (!args  ||  typeof args != 'object') {
+            throw new Error ('Invalid argument');
+        }
+
+    } else {
+
+        /* Value is already an array of zero or many items => no conversion */
+        args = value;
+
+    }
+
+    /* Get x, y, z and w components */
+    var x, y, z;
+    if (args instanceof Vector) {
+
+        /* Argument is a vector */
+        x = args[0];
+        y = args[1];
+        z = args[2];
+        w = 1;
+
+    } else if (typeof args.length != 'undefined') {
+
+        /* Argument is an indexed array */
+        z = 0;
+        switch (args.length) {
+        case 4:
+            w = VectorMath.parseFloat (args[3]);
+            /*FALLTHROUGH*/
+
+        case 3:
+            z = VectorMath.parseFloat (args[2]);
+            /*FALLTHROUGH*/
+
+        case 2:
+            x = VectorMath.parseFloat (args[0]);
+            y = VectorMath.parseFloat (args[1]);
+            break;
+
+        case 0:
+            x = 0;
+            y = 0;
+            break;
+
+        case 1:
+        default:
+            throw new Error ('Invalid argument');
+        }
+
+    } else {
+
+        /* Argument is an associative array */
+        if (typeof args.x != 'undefined') {
+            x = VectorMath.parseFloat (args.x);
+        } else {
+            x = 0;
+        }
+
+        if (typeof args.y != 'undefined') {
+            y = VectorMath.parseFloat (args.y);
+        } else {
+            y = 0;
+        }
+
+        if (typeof args.z != 'undefined') {
+            z = VectorMath.parseFloat (args.z);
+        } else {
+            z = 0;
+        }
+
+        if (typeof args.w != 'undefined') {
+            w = VectorMath.parseFloat (args.w);
+        }
+
+    }
+
+    return [ x, y, z, w ];
+};
+
 /**
  * Construct new vector.
  *
@@ -41,87 +204,34 @@
  * @param float w
  */
 function Vector (/*args*/) {
-    /* Get list of arguments */
-    var args;
-    if (arguments.length == 1) {
+    /* Get the four coordinate components */
+    var arr = VectorMath.getArray (arguments, 1);
 
-        /* Exactly one argument provided: treat it as object or array */
-        args = arguments[0];
-        if (!args  ||  typeof args != 'object') {
-            throw new Error ('Invalid argument');
-        }
+    /* Store coordinate components */
+    if (arr[3] == 1) {
+
+        /* Store normalized vector */
+        this[0] = arr[0];
+        this[1] = arr[1];
+        this[2] = arr[2];
+        this[3] = 1;
+
+    } else if (Math.abs (arr[3]) > 1.0e-6) {
+
+        /* Normalize vector such that w is 1 */
+        var w = 1.0 / arr[3];
+        this[0] = arr[0] * w;
+        this[1] = arr[1] * w;
+        this[2] = arr[2] * w;
+        this[3] = 1;
 
     } else {
 
-        /* Zero or many arguments provided */
-        args = arguments;
+        throw new Error ('Division by zero');
 
     }
-
-    /* Get x-coordinate from argument list */
-    var x;
-    if (typeof args[0] != 'undefined') {
-        x = Vector.parseFloat (args[0]);
-    } else if (typeof args.x != 'undefined') {
-        x = Vector.parseFloat (args.x);
-    } else {
-        x = 0;
-    }
-
-    /* Get y-coordinate */
-    var y;
-    if (typeof args[1] != 'undefined') {
-        y = Vector.parseFloat (args[1]);
-    } else if (typeof args.y != 'undefined') {
-        y = Vector.parseFloat (args.y);
-    } else {
-        y = 0;
-    }
-
-    /* Get z-coordinate */
-    var z;
-    if (typeof args[2] != 'undefined') {
-        z = Vector.parseFloat (args[2]);
-    } else if (typeof args.z != 'undefined') {
-        z = Vector.parseFloat (args.z);
-    } else {
-        z = 0;
-    }
-
-    /* Handle the w-coordinate component */
-    if (typeof args[3] != 'undefined'  ||  typeof args.w != 'undefined') {
-        var w;
-
-        /* Read w-coordinate from argument list */
-        if (typeof args[3] != 'undefined') {
-            w = Vector.parseFloat (args[3]);
-        } else if (typeof args.w != 'undefined') {
-            w = Vector.parseFloat (args.w);
-        } else {
-            throw new Error ('Missing w');
-        }
-
-        /* Avoid division by zero error */
-        if (Math.abs (w) > 1.0e-6) {
-
-            /* Normalize x, y and z-coordinate components such that w is 1 */
-            x /= w;
-            y /= w;
-            z /= w;
-
-        } else {
-            throw new Error ('Division by zero');
-        }
-
-    }
-
-    /* Store coordinate */
-    this[0] = x;
-    this[1] = y;
-    this[2] = z;
-    this[3] = 1;
 }
-Vector.prototype = {};
+Vector.prototype = Object.create (VectorMath.prototype);
 Vector.prototype.constructor = Vector;
 
 /* Access elements of vector through variables x, y, z and w */
@@ -213,65 +323,6 @@ Vector.getInstance = function (v) {
         /* Null object or zero scalar argument */
         throw new Error ('Invalid argument');
     }
-    return r;
-};
-
-/*
- * Convert argument to floating point number.
- *
- * The function expects to receive a string or floating point argument as an
- * input.
- *
- * The function returns floating point number.  If the argument cannot be
- * converted to a floating point number, then the function throws an
- * exception.
- *
- * Example:
- *
- *     // Returns 1.5
- *     var f = Vector.parseFloat ('1.5');
- *
- * @param mixed value
- * @return float
- */
-Vector.parseFloat = function (value) {
-    var r;
-
-    var type = typeof value;
-    switch (type) {
-    case 'number':
-        /* Argument is already a number, no conversion needed */
-        r = value;
-        break;
-
-    case 'string':
-        /* Convert from string */
-        if (/^(\-|\+)?([0-9]+(\.[0-9]+)?)$/.test (value)) {
-
-            /* Convert to floating point number */
-            r = parseFloat (value);
-
-            /* Make sure that the string can be expressed as a number */
-            if (!isFinite (r)) {
-                throw new Error ('Invalid number ' + value);
-            }
-
-        } else {
-            /* Invalid number format, e.g. "12x" */
-            throw new Error ('Invalid number ' + value);
-        }
-
-        break;
-
-    case 'boolean':
-    case 'object':
-    case 'undefined':
-    case 'function':
-    default:
-        /* No conversion possible */
-        throw new Error ('Invalid data type ' + type);
-    }
-
     return r;
 };
 
@@ -461,7 +512,7 @@ Vector.prototype.mul = function (f) {
     var r;
 
     /* Ensure that argument is a valid number */
-    var value = Vector.parseFloat (f);
+    var value = VectorMath.parseFloat (f);
 
     /* Multiply vector */
     this[0] *= value;
@@ -507,7 +558,7 @@ Vector.mul = function (a, f) {
  */
 Vector.prototype.div = function (f) {
     /* Make sure that argument is a valid number */
-    var value = Vector.parseFloat (f);
+    var value = VectorMath.parseFloat (f);
 
     /* Check against division by zero */
     if (Math.abs (value) > 1.0e-6) {
@@ -727,7 +778,7 @@ Vector.prototype.cross = function (b) {
 };
 
 /**
- * Compute cross product between two vectors.
+ * Compute cross product of two vectors.
  *
  * The function expects to receive two vectors (or arrays convertible to
  * vectors) as input arguments.
@@ -769,7 +820,7 @@ Vector.prototype.dot = function (b) {
 };
 
 /**
- * Compute dot product.
+ * Compute dot product of two vectors.
  *
  * The function expects to receive the right-hand operand as an input.  This
  * operand may be a vector, an indexed array or an associative array with x,
@@ -784,6 +835,509 @@ Vector.prototype.dot = function (b) {
 Vector.dot = function (a, b) {
     var dup = new Vector (a);
     return dup.dot (b);
+};
+
+/**
+ * Create 4x4 matrix.
+ *
+ * The constructor can be invoked in several forms:
+ *
+ *   (1) as new Matrix ()
+ *   (2) as new Matrix (r1, r2, r3, r4)
+ */
+function Matrix (/*m*/) {
+    /* Get cell values */
+    var m;
+    if (arguments.length == 1) {
+
+        /* Exactly one argument provided: treat it as object or array */
+        m = arguments[0];
+        if (!m  ||  typeof m != 'object') {
+            throw new Error ('Invalid argument');
+        }
+
+    } else {
+        m = arguments;
+    }
+
+    /* Get rows of source matrix */
+    var r1, r2, r3, r4;
+    if (m instanceof Matrix) {
+
+        /* 
+         * Copy-construct from another Matrix object.  Be ware that the
+         * code below could also be achieved by:
+         *
+         *   r1 = m[0].slice (0);
+         *   r2 = m[1].slice (0);
+         *   r3 = m[2].slice (0);
+         *   r4 = m[3].slice (0);
+         *
+         * However, copying each element individually seems to be faster.
+         */
+        var m0 = m[0];
+        var m1 = m[1];
+        var m2 = m[2];
+        var m3 = m[3];
+        r1 = [ m0[0], m0[1], m0[2], m0[3] ];
+        r2 = [ m1[0], m1[1], m1[2], m1[3] ];
+        r3 = [ m2[0], m2[1], m2[2], m2[3] ];
+        r4 = [ m3[0], m3[1], m3[2], m3[3] ];
+
+    } else if (m.length == 0) {
+
+        /* Construct unity matrix */
+        r1 = [ 1, 0, 0, 0 ];
+        r2 = [ 0, 1, 0, 0 ];
+        r3 = [ 0, 0, 1, 0 ];
+        r4 = [ 0, 0, 0, 1 ];
+
+    } else {
+
+        /* Get first row */
+        if (m.length > 0) {
+            r1 = VectorMath.getArray (m[0], 0);
+        } else {
+            r1 = [ 1, 0, 0, 0 ];
+        }
+
+        /* Get second row */
+        if (m.length > 1) {
+            r2 = VectorMath.getArray (m[1], 0);
+        } else {
+            r2 = [ 0, 1, 0, 0 ];
+        }
+
+        /* Get third row */
+        if (m.length > 2) {
+            r3 = VectorMath.getArray (m[2], 0);
+        } else {
+            r3 = [ 0, 0, 1, 0 ];
+        }
+
+        /* Get fourth row */
+        if (m.length > 3) {
+            r4 = VectorMath.getArray (m[3], 1);
+        } else {
+            r4 = [ 0, 0, 0, 1 ];
+        }
+
+    }
+
+    /* Store rows */
+    this[0] = r1;
+    this[1] = r2;
+    this[2] = r3;
+    this[3] = r4;
+}
+Matrix.prototype = Object.create (VectorMath.prototype);
+Matrix.prototype.constructor = Matrix;
+
+/* Access dimension of matrix through length property */
+Object.defineProperty (Matrix.prototype, 'length', {
+    enumerable: true,
+    configurable: false,
+    get: function () {
+        return 4;
+    },
+});
+
+/**
+ * Make unity matrix.
+ *
+ * The function expects no parameters.  The function returns a reference
+ * to 'this' object which may be used for chaining mathematical operations.
+ *
+ * @return Matrix
+ */
+Matrix.prototype.unity = function () {
+    this[0] = [ 1, 0, 0, 0 ];
+    this[1] = [ 0, 1, 0, 0 ];
+    this[2] = [ 0, 0, 1, 0 ];
+    this[3] = [ 0, 0, 0, 1 ];
+    return this;
+};
+
+/**
+ * Convert argument to matrix.
+ *
+ * The function expects to receive a matrix object or array as an argument.
+ *
+ * The function returns a reference to matrix object.  If the argument is a
+ * matrix, then the function returns the argument as is.  Otherwise, the
+ * function creates a new matrix.  If the input argument cannot be converted
+ * into a matrix, then the function throws an exception.
+ *
+ * @param mixed arg
+ * @return Matrix
+ */
+Matrix.getInstance = function (arg) {
+    var m;
+
+    if (arg) {
+        if (typeof arg == 'object') {
+
+            if (arg instanceof Matrix) {
+
+                /* Argument is already matrix, no conversion needed */
+                m = arg;
+
+            } else {
+
+                /* Try to convert the argument to a matrix */
+                m = new Matrix (arg);
+
+            }
+
+        } else {
+            /* Non-zero scalar argument */
+            throw new Error ('Invalid argument');
+        }
+    } else {
+
+        /* Null object or zero scalar argument */
+        throw new Error ('Invalid argument');
+
+    }
+    return m;
+};
+
+/**
+ * Clone matrix.
+ *
+ * The function accepts no arguments.  The function returns a new Matrix
+ * object that contains a copy of the transformation matrix.
+ *
+ * @return Matrix
+ */
+Matrix.prototype.clone = function () {
+    return new Matrix (this);
+};
+
+/* Alias */
+Matrix.clone = function (m) {
+    return new Matrix (m);
+};
+
+/* Alias */
+Matrix.prototype.dup = function () {
+    return new Matrix (this);
+};
+
+/* Alias */
+Matrix.dup = function (m) {
+    return new Matrix (m);
+};
+
+/**
+ * Get row from matrix.
+ *
+ * @param int i Row number from 0 to 3 (inclusive)
+ * @return array
+ */
+Matrix.prototype.getRow = function (i) {
+    var row;
+
+    if (0 <= i  &&  i < 4) {
+        row = this[i];
+    } else {
+        throw new Error ('Invalid row ' + i);
+    }
+
+    return row;
+};
+
+/**
+ * Get column from matrix.
+ *
+ * @param int j Column number from 0 to 3 (inclusive)
+ * @return array
+ */
+Matrix.prototype.getColumn = function (j) {
+    var col;
+
+    if (0 <= j  &&  j < 4) {
+        col = [
+            this[0][j],
+            this[1][j],
+            this[2][j],
+            this[3][j]
+        ];
+    } else {
+        throw new Error ('Invalid column ' + j);
+    }
+
+    return col;
+};
+
+/**
+ * Multiply matrix.
+ *
+ * The function expects to receive a matrix object or an array convertible to
+ * matrix as an input argument.
+ *
+ * The function updates 'this' matrix and returns a reference to the
+ * 'this' matrix .
+ *
+ * @param mixed b Right-hand operator
+ * @return Matrix
+ */
+Matrix.prototype.mul = function (b) {
+    /* Do a full 4x4 matrix multiply since contents of b are unknown */
+    Matrix._mul4 (this, this, Matrix.getInstance (b));
+    return this;
+};
+
+/* Multiply with 3x1 submatrix at upper right corner */
+Matrix._mul1 = function (c, a, b) {
+    var b1 = b[0];
+    var b2 = b[1];
+    var b3 = b[2];
+    var b4 = b[3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        a11,
+        a12,
+        a13,
+        a11 * b1[3] + a12 * b2[3] + a13 * b3[3] + a14
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        a21,
+        a22,
+        a23,
+        a21 * b1[3] + a22 * b2[3] + a23 * b3[3] + a24
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        a31,
+        a32,
+        a33,
+        a31 * b1[3] + a32 * b2[3] + a33 * b3[3] + a34
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        a41,
+        a42,
+        a43,
+        a41 * b1[3] + a42 * b2[3] + a43 * b3[3] + a44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/* Multiply with 2x2 submatrix at upper left corner */
+Matrix._mul2 = function (c, a, b) {
+    var b1 = b[0];
+    var b2 = b[1];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var r1 = [
+        a11 * b1[0] + a12 * b2[0],
+        a11 * b1[1] + a12 * b2[1],
+        a1[2],
+        a1[3]
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var r2 = [
+        a21 * b1[0] + a22 * b2[0],
+        a21 * b1[1] + a22 * b2[1],
+        a2[2],
+        a2[3]
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var r3 = [
+        a31 * b1[0] + a32 * b2[0],
+        a31 * b1[1] + a32 * b2[1],
+        a3[2],
+        a3[3]
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var r4 = [
+        a41 * b1[0] + a42 * b2[0],
+        a41 * b1[1] + a42 * b2[1],
+        a4[2],
+        a4[3]
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/* Multiply with 3x3 submatrix at upper left corner */
+Matrix._mul3 = function (c, a, b) {
+    var b1 = b[0];
+    var b2 = b[1];
+    var b3 = b[2];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var r1 = [
+        a11 * b1[0] + a12 * b2[0] + a13 * b3[0],
+        a11 * b1[1] + a12 * b2[1] + a13 * b3[1],
+        a11 * b1[2] + a12 * b2[2] + a13 * b3[2],
+        a1[3]
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var r2 = [
+        a21 * b1[0] + a22 * b2[0] + a23 * b3[0],
+        a21 * b1[1] + a22 * b2[1] + a23 * b3[1],
+        a21 * b1[2] + a22 * b2[2] + a23 * b3[2],
+        a2[3]
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var r3 = [
+        a31 * b1[0] + a32 * b2[0] + a33 * b3[0],
+        a31 * b1[1] + a32 * b2[1] + a33 * b3[1],
+        a31 * b1[2] + a32 * b2[2] + a33 * b3[2],
+        a3[3]
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var r4 = [
+        a41 * b1[0] + a42 * b2[0] + a43 * b3[0],
+        a41 * b1[1] + a42 * b2[1] + a43 * b3[1],
+        a41 * b1[2] + a42 * b2[2] + a43 * b3[2],
+        a4[3]
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/* Full 4x4 matrix multiply */
+Matrix._mul4 = function (c, a, b) {
+    var b1 = b[0];
+    var b2 = b[1];
+    var b3 = b[2];
+    var b4 = b[3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        a11 * b1[0] + a12 * b2[0] + a13 * b3[0] + a14 * b4[0],
+        a11 * b1[1] + a12 * b2[1] + a13 * b3[1] + a14 * b4[1],
+        a11 * b1[2] + a12 * b2[2] + a13 * b3[2] + a14 * b4[2],
+        a11 * b1[3] + a12 * b2[3] + a13 * b3[3] + a14 * b4[3]
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        a21 * b1[0] + a22 * b2[0] + a23 * b3[0] + a24 * b4[0],
+        a21 * b1[1] + a22 * b2[1] + a23 * b3[1] + a24 * b4[1],
+        a21 * b1[2] + a22 * b2[2] + a23 * b3[2] + a24 * b4[2],
+        a21 * b1[3] + a22 * b2[3] + a23 * b3[3] + a24 * b4[3]
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        a31 * b1[0] + a32 * b2[0] + a33 * b3[0] + a34 * b4[0],
+        a31 * b1[1] + a32 * b2[1] + a33 * b3[1] + a34 * b4[1],
+        a31 * b1[2] + a32 * b2[2] + a33 * b3[2] + a34 * b4[2],
+        a31 * b1[3] + a32 * b2[3] + a33 * b3[3] + a34 * b4[3]
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        a41 * b1[0] + a42 * b2[0] + a43 * b3[0] + a44 * b4[0],
+        a41 * b1[1] + a42 * b2[1] + a43 * b3[1] + a44 * b4[1],
+        a41 * b1[2] + a42 * b2[2] + a43 * b3[2] + a44 * b4[2],
+        a41 * b1[3] + a42 * b2[3] + a43 * b3[3] + a44 * b4[3]
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/**
+ * Multiply two matrices.
+ *
+ * The function expects to receive two matrices or two-dimensional arrays
+ * convertible to matrices as input arguments.
+ *
+ * The function multiplies the two input arguments and returns the result as
+ * a new matrix.  The input arguments are not modified in the process.
+ *
+ * @param mixed a Left-hand operand
+ * @param mixed b Right-hand operand
+ * @return Matrix
+ */
+Matrix.mul = function (a, b) {
+    var c = new Matrix ();
+    Matrix._mul4 (c, a, b);
+    return c;
 };
 
 
