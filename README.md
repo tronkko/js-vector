@@ -54,7 +54,7 @@ following mathematical operations to compute them:
   * Substraction: `c = Vector.sub (a, b);`
   * Multiplication: `c = Vector.mul (a, f);`
   * Division: `c = Vector.div (a, f);`
-  * Length: `f = Vector.length (a);`
+  * Length: `f = Vector.len (a);`
   * Normalization: `c = Vector.normalize (a);`
   * Negation: `c = Vector.neg (a);`
   * Cross product: `c = Vector.cross (a, b);`
@@ -68,7 +68,7 @@ you to build complicated calculations without creating temporary vectors
 explicitly.  For example, you can compute the distance between
 points `p` and `q` simply as
 ```
-var distance = Vector.length (Vector.sub (p, q));
+var distance = Vector.len (Vector.sub (p, q));
 ```
 without modifying the vector `p` by accident.
 
