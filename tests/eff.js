@@ -13,7 +13,7 @@ Test.module ('Efficiency', function () {
     var eps = 10;
 
     /* Set this true to show execution times */
-    var verbose = true;
+    var verbose = false;
 
     /* Efficiency of matrix creation */
     this.test ('eff-100.0', function () {

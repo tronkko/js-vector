@@ -1340,4 +1340,60 @@ Matrix.mul = function (a, b) {
     return c;
 };
 
+/**
+ * Transform vector.
+ *
+ * The function expects to receive a vector object or an array convertible to
+ * vector as an input argument.
+ *
+ * The function multiplies the current matrix with the vector and returns the
+ * result as a new vector object.  Neither the input matrix or vector is
+ * modified in the process.
+ *
+ * @param mixed b Vector or array convertible to vector.
+ * @return Vector
+ */
+Matrix.prototype.transform = function (b) {
+    /* Convert argument to vector */
+    b = Vector.getInstance (b);
+
+    /* Rows of source of matrix */
+    var a1 = this[0];
+    var a2 = this[1];
+    var a3 = this[2];
+    var a4 = this[3];
+
+    /* Cells of column vector */
+    var b1 = b[0];
+    var b2 = b[1];
+    var b3 = b[2];
+
+    /* Multiple 4x4 and 4x1 matrices */
+    var v = new Vector(
+        a1[0] * b1 + a1[1] * b2 + a1[2] * b3 + a1[3],
+        a2[0] * b1 + a2[1] * b2 + a2[2] * b3 + a2[3],
+        a3[0] * b1 + a3[1] * b2 + a3[2] * b3 + a3[3],
+        a4[0] * b1 + a4[1] * b2 + a4[2] * b3 + a4[3]
+    );
+    return v;
+};
+
+/**
+ * Multiply matrix and vector.
+ *
+ * The function expects to receive a matrix and vector, or something
+ * convertible to matrix and vector, as an input arguments.
+ *
+ * The function multiplies matrix and vector while returning a reference to a
+ * new vector object.  Neither matrix or vector argument is modified in the
+ * process.
+ *
+ * @param mixed a Matrix
+ * @param mixed b Vector
+ * @return Vector
+ */
+Matrix.transform = function (a, b) {
+    var m = Matrix.getInstance (a);
+    return m.transform (b);
+};
 
