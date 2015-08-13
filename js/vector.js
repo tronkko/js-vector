@@ -1077,7 +1077,8 @@ Matrix.prototype.getColumn = function (j) {
  * matrix as an input argument.
  *
  * The function updates 'this' matrix and returns a reference to the
- * 'this' matrix .
+ * 'this' matrix.  The returned value may be used for chaining mathematical
+ * operations.
  *
  * @param mixed b Right-hand operator
  * @return Matrix
@@ -1395,5 +1396,105 @@ Matrix.prototype.transform = function (b) {
 Matrix.transform = function (a, b) {
     var m = Matrix.getInstance (a);
     return m.transform (b);
+};
+
+/**
+ * Scale matrix.
+ *
+ * The function can be used in three different forms:
+ *
+ *   (1) as m.scale (f)
+ *   (2) as m.scale (sx, sy)
+ *   (3) as m.scale (sx, sy, sz)
+ *
+ * The first form scales the x, y and z axis by the constant factor f.  The
+ * second form scales x and y axis with factors sx and sy, respectively, while
+ * leaving the z axis unscaled.  The third form multiplies x, y and z axis
+ * with factors sx, sy and sz, respectively.
+ *
+ * The function updates 'this' matrix and returns a reference to the
+ * 'this' matrix.  The returned value may be used for chaining mathematical
+ * operations.
+ *
+ * Example:
+ *
+ *     // Returns [ 1, 1, 1, 1 ]
+ *     var v = m.transform (1, 1, 1);
+ *
+ *     // Scale by constant factor
+ *     m.scale (10);
+ *
+ *     // Now returns [ 10, 10, 10, 1 ]
+ *     var v = m.transform (1, 1, 1);
+ *
+ * @param float sx
+ * @param float sy
+ * @param float sz
+ * @return Matrix
+ */
+Matrix.prototype.scale = function (/*...*/) {
+    /* Get scaling factors */
+    var sx;
+    var sy;
+    var sz;
+    switch (arguments.length) {
+    case 1:
+        sx = VectorMath.parseFloat (arguments[0]);
+        sy = sx;
+        sz = sx;
+        break;
+
+    case 2:
+        sx = VectorMath.parseFloat (arguments[0]);
+        sy = VectorMath.parseFloat (arguments[1]);
+        sz = 1;
+        break;
+
+    case 3:
+        sx = VectorMath.parseFloat (arguments[0]);
+        sy = VectorMath.parseFloat (arguments[1]);
+        sz = VectorMath.parseFloat (arguments[2]);
+        break;
+
+    default:
+        throw new Error ('Invalid arguments');
+    }
+
+    /* Construct scaling transformation */
+    var m = [
+        [ sx, 0,  0,  0 ],
+        [ 0,  sy, 0,  0 ],
+        [ 0,  0,  sz, 0 ],
+        [ 0,  0,  0,  1 ]
+    ];
+
+    /* Multiply with scaling transformation */
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+
+/**
+ * Construct scaled matrix.
+ *
+ * Function excepts to receive a Matrix object or an array convertible to
+ * Matrix object as the first input argument.  Scaling factors are given as
+ * arguments 2, 3 and 4 as in function Matrix.transform.
+ *
+ * The function multiplies the input matrix with the scaling factors and
+ * returns the result as a new Matrix object.  The input matrix is not
+ * modified in the process.
+ *
+ * @param mixed m
+ * @param float sx
+ * @param float sy
+ * @param float sz
+ * @return Matrix
+ */
+Matrix.scale = function (/*...*/) {
+    /* Duplicate source matrix */
+    var m = new Matrix (arguments[0]);
+
+    /* Scale duplicate matrix */
+    return m.scale.apply (m, Array.prototype.slice.call (arguments, 1));
 };
 
