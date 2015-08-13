@@ -1491,10 +1491,57 @@ Matrix.prototype.scale = function (/*...*/) {
  * @return Matrix
  */
 Matrix.scale = function (/*...*/) {
-    /* Duplicate source matrix */
     var m = new Matrix (arguments[0]);
-
-    /* Scale duplicate matrix */
     return m.scale.apply (m, Array.prototype.slice.call (arguments, 1));
+};
+
+/**
+ * Translate origin.
+ *
+ * The function expects to receive a vector or an array convertible to vector
+ * as in input argument.
+ *
+ * The function updates 'this' matrix and returns a reference to the
+ * 'this' matrix.  The returned value may be used for chaining mathematical
+ * operations.
+ *
+ * @param Vector v
+ * @return Matrix
+ */
+Matrix.prototype.translate = function (v) {
+    /* Convert argument to vector */
+    v = Vector.getInstance (v);
+
+    /* Construct translation transformation */
+    var m = [
+        [ 1, 0, 0, v[0] ],
+        [ 0, 1, 0, v[1] ],
+        [ 0, 0, 1, v[2] ],
+        [ 0, 0, 0, 1    ]
+    ];
+
+    /* Multiply current matrix with translation matrix */
+    Matrix._mul1 (this, this, m);
+    return this;
+};
+
+/**
+ * Construct translated matrix.
+ *
+ * The function expects to receive a matrix and vector, or arrays convertible
+ * to matrix and vector, as input arguments.
+ *
+ * The function will multiply the matrix with the translation vector and
+ * return the result as a new Matrix object.  No source operands are modified
+ * in the process.
+ *
+ * @param Matrix m
+ * @param Vector v
+ * @return Matrix
+ */
+Matrix.translate = function (m, v) {
+    var r = new Matrix (m);
+    r.translate (v);
+    return r;
 };
 
