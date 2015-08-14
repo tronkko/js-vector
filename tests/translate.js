@@ -145,5 +145,13 @@ Test.module ('Matrix.translate', function () {
         [ 0, 0, 0, 1 ]
     ]);
 
+    /* Translation offset can be given as separate arguments */
+    this.test ('translate-170.0', function () {
+        var m = new Matrix ();
+        m.translate (-10, -12, -20);
+        var v = m.transform ([ 0, 0, 0 ]);
+        return [ v[0], v[1], v[2], v[3] ];
+    }, [ -10, -12, -20, 1 ]);
+
 });
 

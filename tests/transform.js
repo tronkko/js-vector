@@ -126,5 +126,16 @@ Test.module ('Matrix.transform', function () {
         return [ v[0], v[1], v[2], v[3] ];
     }, [ 1*9/2, 0, 1*9/2, 1 ]);
 
+    /* Transformed coordinate can be given as separate arguments */
+    this.test ('transform-150.0', function () {
+        var m = new Matrix ([
+            [ 1, 0, 0, 10 ],
+            [ 0, 1, 0, 20 ],
+            [ 0, 0, 1, 30 ],
+            [ 0, 0, 0, 1  ]
+        ]);
+        var v = m.transform (1, 2, 3);
+        return [ v[0], v[1], v[2], v[3] ];
+    }, [ 11, 22, 33, 1 ]);
 });
 

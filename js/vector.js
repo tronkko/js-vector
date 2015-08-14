@@ -82,7 +82,7 @@ VectorMath.parseFloat = function (value) {
  *     var x = VectorMath.getArray ([ 1, 2 ], 1);
  *
  * @param mixed value Value to convert
- * @param float w Default value of fourth component
+ * @param float w Default value of fourth component (mandatory)
  * @return array
  */
 VectorMath.getArray = function (value, w) {
@@ -203,7 +203,7 @@ VectorMath.getArray = function (value, w) {
  * @param float z
  * @param float w
  */
-function Vector (/*args*/) {
+function Vector (/*...*/) {
     /* Get the four coordinate components */
     var arr = VectorMath.getArray (arguments, 1);
 
@@ -1351,12 +1351,12 @@ Matrix.mul = function (a, b) {
  * result as a new vector object.  Neither the input matrix or vector is
  * modified in the process.
  *
- * @param mixed b Vector or array convertible to vector.
+ * @param mixed v Vector or array convertible to vector.
  * @return Vector
  */
-Matrix.prototype.transform = function (b) {
+Matrix.prototype.transform = function (/*...*/) {
     /* Convert argument to vector */
-    b = Vector.getInstance (b);
+    var v = VectorMath.getArray (arguments, 1);
 
     /* Rows of source of matrix */
     var a1 = this[0];
@@ -1365,9 +1365,9 @@ Matrix.prototype.transform = function (b) {
     var a4 = this[3];
 
     /* Cells of column vector */
-    var b1 = b[0];
-    var b2 = b[1];
-    var b3 = b[2];
+    var b1 = v[0];
+    var b2 = v[1];
+    var b3 = v[2];
 
     /* Multiple 4x4 and 4x1 matrices */
     var v = new Vector(
@@ -1505,12 +1505,19 @@ Matrix.scale = function (/*...*/) {
  * 'this' matrix.  The returned value may be used for chaining mathematical
  * operations.
  *
+ * Example:
+ *
+ *     // Set v to [ 0, 0, 0, 1 ]
+ *     var m = new Matrix ();
+ *     m.translate (1, 2, 3);
+ *     var v = m.transform (
+ *
  * @param Vector v
  * @return Matrix
  */
-Matrix.prototype.translate = function (v) {
-    /* Convert argument to vector */
-    v = Vector.getInstance (v);
+Matrix.prototype.translate = function (/*...*/) {
+    /* Convert argument to array */
+    var v = VectorMath.getArray (arguments, 1);
 
     /* Construct translation transformation */
     var m = [
@@ -1540,8 +1547,48 @@ Matrix.prototype.translate = function (v) {
  * @return Matrix
  */
 Matrix.translate = function (m, v) {
-    var r = new Matrix (m);
-    r.translate (v);
-    return r;
+    var dup = new Matrix (m);
+    return dup.translate (v);
+};
+
+/**
+ * Transpose matrix.
+ *
+ * The function transposes the 'this' matrix and returns a reference to the
+ * 'this' matrix.
+ *
+ * @return Matrix
+ */
+Matrix.prototype.transpose = function () {
+    /* Copy rows to temporary variables */
+    var r1 = this[0];
+    var r2 = this[1];
+    var r3 = this[2];
+    var r4 = this[3];
+
+    /* Exchange rows and columns */
+    this[0] = [ r1[0], r2[0], r3[0], r4[0] ];
+    this[1] = [ r1[1], r2[1], r3[1], r4[1] ];
+    this[2] = [ r1[2], r2[2], r3[2], r4[2] ];
+    this[3] = [ r1[3], r2[3], r3[3], r4[3] ];
+    return this;
+};
+
+/**
+ * Construct transpose of a matrix.
+ *
+ * The function expects to receive a Matrix object or an array convertible to
+ * Matrix as an input argument.
+ *
+ * The function transposes the argument matrix and returns a new Matrix object
+ * that contains the result.  The input argument is not modified in the
+ * process.
+ *
+ * @param Matrix m
+ * @return Matrix
+ */
+Matrix.transpose = function (m) {
+    var dup = new Matrix (m);
+    return dup.transpose ();
 };
 
