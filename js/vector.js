@@ -17,10 +17,9 @@ VectorMath.prototype.constructor = VectorMath;
 /*
  * Convert argument to floating point number.
  *
- * The function expects to receive a string or floating point argument as an
- * input.
+ * The function expects to receive a string or floating point argument.
  *
- * The function returns floating point number.  If the argument cannot be
+ * The function returns a floating point number.  If the argument cannot be
  * converted to a floating point number, then the function throws an
  * exception.
  *
@@ -61,9 +60,12 @@ VectorMath.parseFloat = function (value) {
 
         break;
 
+    case 'undefined':
+        throw new Error ('Missing argument');
+        break;
+
     case 'boolean':
     case 'object':
-    case 'undefined':
     case 'function':
     default:
         /* No conversion possible */
@@ -138,7 +140,7 @@ VectorMath.getArray = function (value, w) {
 
         case 1:
         default:
-            throw new Error ('Invalid argument');
+            throw new Error ('Invalid arguments');
         }
 
     } else {
@@ -207,18 +209,18 @@ function Vector (/*...*/) {
     /* Get the four coordinate components */
     var arr = VectorMath.getArray (arguments, 1);
 
-    /* Store coordinate components */
+    /* Normalize coordinate components */
     if (arr[3] == 1) {
 
-        /* Store normalized vector */
+        /* Components are already in normalized form */
         this[0] = arr[0];
         this[1] = arr[1];
         this[2] = arr[2];
         this[3] = 1;
 
-    } else if (Math.abs (arr[3]) > 1.0e-6) {
+    } else if (arr[3] > 1.0e-6) {
 
-        /* Normalize vector such that w is 1 */
+        /* Normalize components such that w becomes 1 */
         var w = 1.0 / arr[3];
         this[0] = arr[0] * w;
         this[1] = arr[1] * w;
@@ -227,7 +229,11 @@ function Vector (/*...*/) {
 
     } else {
 
-        throw new Error ('Division by zero');
+        /* Point in infinity */
+        this[0] = arr[0] * 1e12;
+        this[1] = arr[1] * 1e12;
+        this[2] = arr[2] * 1e12;
+        this[3] = 1;
 
     }
 }
@@ -279,11 +285,12 @@ Object.defineProperty (Vector.prototype, 'length', {
  * The function expects to receive an indexed array, an associative array or
  * a vector as an argument.
  *
- * The function returns a vector object.  If the argument was an array of some
- * kind, then the result will be a new vector.  If the input argument was
- * already a vector, then the very same object is returned as a result.  If
- * the input argument cannot be converted into a vector, then the function
- * throws an exception.
+ * The function returns new vector or a reference to source vector depending
+ * on the argument: if the input argument is an array of some kind, then the
+ * function will construct a new vector and return that.  If the input
+ * argument is already a vector, then the function returns a reference to the
+ * input argument.  If the input argument cannot be converted into a vector,
+ * then the function throws an exception.
  *
  * Example:
  *
@@ -331,7 +338,7 @@ Vector.getInstance = function (v) {
  *
  * The function accepts no arguments.
  *
- * The function returns a new Vector object that contains copy of the
+ * The function returns a new vector object that contains copy of the
  * coordinate components.
  *
  * Example:
@@ -368,12 +375,14 @@ Vector.dup = function (v) {
 /**
  * Add vector.
  *
- * The function expects to receive the right-hand operand as an input.  This
- * operand may be a vector object, an indexed array or an associative
+ * The function expects to receive the right-hand vector as an input argument.
+ * The argument may be a vector object, an indexed array or an associative
  * array with x, y, z and possibly w components.
  *
- * The function updates 'this' object and returns a reference to 'this' object
- * which may be used for chaining mathematical operations.
+ * The function adds the right-hand operand to the left-hand operand and
+ * stores the result to the left-hand operand.  The function returns a
+ * referece to the left-hand operand which may be used for chaining
+ * mathematical operations.
  *
  * Example:
  *
@@ -381,7 +390,7 @@ Vector.dup = function (v) {
  *     var a = new Vector (100, 100);
  *     var b = new Vector (10, -10);
  *
- *     // Add vector b and store the result to vector a
+ *     // Compute a = a + b
  *     a.add (b);
  *
  *     // Output updated vector a, now (110,90)
@@ -404,11 +413,13 @@ Vector.prototype.add = function (b) {
 /**
  * Add two vectors.
  *
- * The function expects to receive two vectors (or arrays convertible to
- * vectors) as input arguments.
+ * The function expects to receive left and right-hand vectors as input
+ * arguments.  These arguments may be vector objects or arrays convertible to
+ * vectors.
  *
- * The function returns a new vector that contains the result of the addition.
- * No source operand is modified in the process.
+ * The function adds the right-hand operand to the left-hand operand and
+ * returns the result as a new vector.  No source operand is modified in the
+ * process.
  *
  * Example:
  *
@@ -416,7 +427,7 @@ Vector.prototype.add = function (b) {
  *     var a = new Vector (100, 100);
  *     var b = new Vector (10, -10);
  *
- *     // Add vectors a and b storing the result to vector v
+ *     // Compute v = a + b
  *     var v = Vector.add (a, b);
  *
  *     // Output coordinate 110,90
@@ -434,19 +445,21 @@ Vector.add = function (a, b) {
 /**
  * Substract vector.
  *
- * The function expects to receive the right-hand operand as an input.  The
- * input argument may be a vector object, an indexed array or an associative
+ * The function expects to receive right-hand vector as an input argument.
+ * This argument may be a vector object, an indexed array or an associative
  * array with x, y, z and possibly w components.
  *
- * The function updates 'this' object and returns a reference to 'this' object
- * which may be used for chaining mathematical operations.
+ * The function substracts right-hand operand from the left-hand operand and
+ * stores the result to left-hand operand.  The function returns a reference
+ * to the left-hand operand which may be used for chaining mathematical
+ * operations.
  *
  * Example:
  *
- *     // Substract b from vector a
+ *     // Compute a = a - b
  *     a.sub (b);
  *
- *     // Substract temporary vector (1,0) from vector v
+ *     // Compute v = v - (1,0,0)
  *     v.sub ([1, 0]);
  *
  * @param mixed b Right-hand operand (vector or array)
@@ -466,15 +479,17 @@ Vector.prototype.sub = function (b) {
 /**
  * Substract two vectors.
  *
- * The function expects to receive two vectors (or arrays convertible to
- * vectors) as input arguments.
+ * The function expects to receive left and right-hand vectors as input
+ * arguments.  These arguments may be vector objects or arrays convertible to
+ * vectors.
  *
- * The function returns a new vector that contains the result of the
- * substraction.  No source operand is modified in the process.
+ * The function substracts right-hand operand from the left-hand operand and
+ * returns the result as a new vector.  No source operand is modified in the
+ * process.
  *
  * Example:
  *
- *     // Substract vectors p and q storing the result to v
+ *     // Compute v = p - q
  *     var v = Vector.sub (p, q);
  *
  * @param mixed a Left-hand operand (vector or array)
@@ -491,15 +506,15 @@ Vector.sub = function (a, b) {
  *
  * The function expects to receive a single number as an input argument.
  *
- * The function updates 'this' vector and returns a reference to 'this' object
- * which may be used for chaining mathematical operations.
+ * The function updates vector operand and returns a reference to it which may
+ * be used for chaining mathematical operations.
  *
  * Example:
  *
  *     // Create vector q
  *     var q = new Vector (1, 2);
  *
- *     // Multiply vector q by 10
+ *     // Compute q = q * 10
  *     q.mul (10);
  *
  *     // Output coordinate 10,20
@@ -522,18 +537,18 @@ Vector.prototype.mul = function (f) {
 };
 
 /**
- * Multiply vector and a number.
+ * Multiply vector with a number.
  *
- * The function expects to receive a vector (or array convertible to vector)
+ * The function expects to receive a vector or array convertible to vector
  * as the first input argument and a scalar number as the second input
  * argument.
  *
- * The function returns a new vector that contains the result of the
- * multiplication.  No input operands are modified in the process.
+ * The function multiplies the vector with a number and returns the result as
+ * a new vector object.  No input operands are modified in the process.
  *
  * Example:
  *
- *     // Create vector q that is multiple of vector v
+ *     // Compute q = v * 10
  *     var q = Vector.mul (v, 10);
  *
  * @param mixed a Left-hand operand (vector or array)
@@ -546,12 +561,13 @@ Vector.mul = function (a, f) {
 };
 
 /**
- * Divide vector by a number.
+ * Divide vector by number.
  *
  * The function expects to receive a single number as an input argument.
  *
- * The function updates 'this' object and returns a reference to 'this' object
- * which may be used for chaining mathematical operations.
+ * The function multiplies the left-hand vector with the inverse number and
+ * returns a reference to the left-hand vector.  If the input argument is
+ * zero, then the function throws an exception.
  *
  * @param float f
  * @return Vector
@@ -573,14 +589,15 @@ Vector.prototype.div = function (f) {
 };
 
 /**
- * Divide vector and a number.
+ * Divide vector by number.
  *
- * The function expects to receive a vector (or array convertible to vector)
+ * The function expects to receive a vector or array convertible to vector
  * as the first input argument and a scalar number as the second input
  * argument.
  *
- * The function returns a new vector that contains the result of the
- * division.  No input operands are modified in the process.
+ * The function multiplies the source vector with the inverse number and
+ * returns the result as a new vector.  No input operands are modified in the
+ * process.
  *
  * @param mixed a Left-hand operand (vector or array)
  * @param float f Right-hand operand
@@ -624,12 +641,13 @@ Vector.len = function (a) {
 };
 
 /**
- * Normalize vector's length.
+ * Normalize length.
  *
  * The function accepts no input arguments.
  *
- * The function updates 'this' object and returns a reference to 'this' object
- * which can be used for chaining mathematical operations.
+ * The function updates the left-hand vector such that the length becomes 1.
+ * The function returns a reference to the left-hand vector which can be used
+ * for chaining mathematical operations.
  *
  * Example:
  *
@@ -661,9 +679,9 @@ Vector.prototype.normalize = function () {
 };
 
 /**
- * Create normalized vector.
+ * Construct normalized vector.
  *
- * The function expects to receive a vector (or array convertible to vector)
+ * The function expects to receive a vector or array convertible to vector
  * as an input argument.
  *
  * The function returns a new vector object that contains the normalized
@@ -692,15 +710,15 @@ Vector.normalize = function (a) {
  *
  * The function accepts no input arguments.
  *
- * The function updates 'this' object and returns a reference to 'this' object
- * which can be used for chaining mathematical operations.
+ * The function updates the left-hand vector and returns a reference it which
+ * can be used for chaining mathematical operations.
  *
  * Example:
  *
  *     // Construct vector
  *     var v = new Vector (100, 100);
  *
- *     // Negate vector
+ *     // Compute v = -v
  *     v.neg ();
  *
  *     // Output negated coordinate -100,-100
@@ -716,9 +734,9 @@ Vector.prototype.neg = function () {
 };
 
 /**
- * Create negated vector.
+ * Construct negated vector.
  *
- * The function expects to receive a vector (or array convertible to vector)
+ * The function expects to receive a vector or array convertible to vector
  * as an input argument.
  *
  * The function returns a new vector that contains the result of the
@@ -729,7 +747,7 @@ Vector.prototype.neg = function () {
  *     // Construct vector
  *     var v = new Vector (100, 100);
  *
- *     // Create negated vector q without chaning v
+ *     // Compute q = -v
  *     var q = Vector.neg (v);
  *
  *     // Output negated coordinate -100,-100
@@ -745,12 +763,12 @@ Vector.neg = function (a) {
 /**
  * Compute cross product.
  *
- * The function expects to receive the right-hand operand as an input.  This
- * operand may be a vector, an indexed array or an associative array with x,
- * y, z and optional w components.
+ * The function expects to receive the right-hand vector as an input argument.
+ * This argument may be a vector object, an indexed array or an associative
+ * array with x, y, z and optional w components.
  *
- * The function stores the result to 'this' object and returns a reference to
- * 'this' object which may be used for chaining mathematical operations.
+ * The function stores the result to the left-hand vector and returns a
+ * reference to it which may be used for chaining mathematical operations.
  *
  * @param mixed b Right-hand operand (vector or array)
  * @return Vector
@@ -780,8 +798,8 @@ Vector.prototype.cross = function (b) {
 /**
  * Compute cross product of two vectors.
  *
- * The function expects to receive two vectors (or arrays convertible to
- * vectors) as input arguments.
+ * The function expects to receive two vectors or arrays convertible to
+ * vectors as input arguments.
  *
  * The function returns a new vector that contains the result.  The source
  * operands are not modified in the process.
@@ -798,11 +816,11 @@ Vector.cross = function (a, b) {
 /**
  * Compute dot product.
  *
- * The function expects to receive the right-hand operand as an input.  This
- * operand may be a vector, an indexed array or an associative array with x,
- * y, z and optional w components.
+ * The function expects to receive the right-hand vector as an input argument.
+ * This argument may be a vector object, an indexed array or an associative
+ * array with x, y, z and optional w components.
  *
- * The function updates 'this' object and returns a reference to 'this' object
+ * The function updates the left-hand vector and returns a reference to it
  * which may be used for chaining mathematical operations.
  *
  * @param mixed b Right-hand operand (vector or array)
@@ -822,9 +840,9 @@ Vector.prototype.dot = function (b) {
 /**
  * Compute dot product of two vectors.
  *
- * The function expects to receive the right-hand operand as an input.  This
- * operand may be a vector, an indexed array or an associative array with x,
- * y, z and optional w components.
+ * The function expects to receive left and right-hand vectors as an input
+ * arguments.  These arguments may be a vector objects, indexed arrays or
+ * associative arrays with x, y, z and optional w components.
  *
  * The function returns a new vector that contains the result.  No source
  * arguments are modified in the process.
@@ -843,7 +861,29 @@ Vector.dot = function (a, b) {
  * The constructor can be invoked in several forms:
  *
  *   (1) as new Matrix ()
- *   (2) as new Matrix (r1, r2, r3, r4)
+ *   (2) as new Matrix (m)
+ *   (3) as new Matrix (arr)
+ *
+ * The first form creates a unity matrix, the second from creates a copy of
+ * the matrix m and third from initializes matrix from two-dimensional array.
+ *
+ * Example:
+ *
+ *     // Construct translation matrix from rows
+ *     var m = new Matrix ([
+ *         [ 1, 0, 0, x ], 
+ *         [ 0, 1, 0, y ],
+ *         [ 0, 0, 1, z ],
+ *         [ 0, 0, 0, 1 ]
+ *     ]);
+ *
+ *     // Copy-construct
+ *     var q = new Matrix (m);
+ *
+ *     // Create unity matrix
+ *     var r = new Matrix ();
+ *
+ * @param mixed m Optional source operand (matrix or array)
  */
 function Matrix (/*m*/) {
     /* Get cell values */
@@ -943,10 +983,12 @@ Object.defineProperty (Matrix.prototype, 'length', {
 });
 
 /**
- * Make unity matrix.
+ * Construct unity matrix.
  *
- * The function expects no parameters.  The function returns a reference
- * to 'this' object which may be used for chaining mathematical operations.
+ * The function expects no parameters.
+ *
+ * The function returns a reference to the left-hand operand which may be used
+ * for chaining mathematical operations.
  *
  * @return Matrix
  */
@@ -961,12 +1003,14 @@ Matrix.prototype.unity = function () {
 /**
  * Convert argument to matrix.
  *
- * The function expects to receive a matrix object or array as an argument.
+ * The function expects to receive a matrix object or array convertible to
+ * matrix as an input argument.
  *
- * The function returns a reference to matrix object.  If the argument is a
- * matrix, then the function returns the argument as is.  Otherwise, the
- * function creates a new matrix.  If the input argument cannot be converted
- * into a matrix, then the function throws an exception.
+ * The function returns a new matrix object or a reference to existing matrix
+ * depending on the argument: if the argument is a matrix, then the function
+ * returns a reference to it.  If the argument is an array, then the function
+ * creates a new matrix object and returns it.  If the input argument cannot
+ * be converted into a matrix, then the function throws an exception.
  *
  * @param mixed arg
  * @return Matrix
@@ -1005,8 +1049,10 @@ Matrix.getInstance = function (arg) {
 /**
  * Clone matrix.
  *
- * The function accepts no arguments.  The function returns a new Matrix
- * object that contains a copy of the transformation matrix.
+ * The function accepts no arguments.
+ *
+ * The function returns a new Matrix object that is duplicate of the left-hand
+ * matrix.
  *
  * @return Matrix
  */
@@ -1073,12 +1119,12 @@ Matrix.prototype.getColumn = function (j) {
 /**
  * Multiply matrix.
  *
- * The function expects to receive a matrix object or an array convertible to
- * matrix as an input argument.
+ * The function expects to receive right-hand matrix as an input argument.
+ * This argument may be a matrix object or an array convertible to matrix.
  *
- * The function updates 'this' matrix and returns a reference to the
- * 'this' matrix.  The returned value may be used for chaining mathematical
- * operations.
+ * The function multiplies left-hand matrix with the argument and stores the
+ * result to the left-hand matrix.  The function returns a reference to the
+ * left-hand matrix.
  *
  * @param mixed b Right-hand operator
  * @return Matrix
@@ -1325,11 +1371,12 @@ Matrix._mul4 = function (c, a, b) {
 /**
  * Multiply two matrices.
  *
- * The function expects to receive two matrices or two-dimensional arrays
- * convertible to matrices as input arguments.
+ * The function expects to receive left and right-hand matrices as input
+ * arguments.  These input arguments may be matrix objects or two-dimensional
+ * arrays convertible to matrix objects.
  *
- * The function multiplies the two input arguments and returns the result as
- * a new matrix.  The input arguments are not modified in the process.
+ * The function multiplies the two input arguments and returns the result as a
+ * new matrix object.  The input arguments are not modified in the process.
  *
  * @param mixed a Left-hand operand
  * @param mixed b Right-hand operand
@@ -1347,8 +1394,8 @@ Matrix.mul = function (a, b) {
  * The function expects to receive a vector object or an array convertible to
  * vector as an input argument.
  *
- * The function multiplies the current matrix with the vector and returns the
- * result as a new vector object.  Neither the input matrix or vector is
+ * The function multiplies the left-hand matrix with the vector and returns
+ * the result as a new vector object.  Neither the matrix or the vector are
  * modified in the process.
  *
  * @param mixed v Vector or array convertible to vector.
@@ -1382,12 +1429,13 @@ Matrix.prototype.transform = function (/*...*/) {
 /**
  * Multiply matrix and vector.
  *
- * The function expects to receive a matrix and vector, or something
- * convertible to matrix and vector, as an input arguments.
+ * The function expects to receive left-hand matrix and right-hand vector as
+ * input arguments.  These arguments may be matrix and vector objects or
+ * arrays convertible to matrix and vector objects.
  *
- * The function multiplies matrix and vector while returning a reference to a
- * new vector object.  Neither matrix or vector argument is modified in the
- * process.
+ * The function multiplies the left-hand matrix with the right-hand vector and
+ * returns the result as a new vector object.  No arguments are modified in
+ * the process.
  *
  * @param mixed a Matrix
  * @param mixed b Vector
@@ -1407,14 +1455,12 @@ Matrix.transform = function (a, b) {
  *   (2) as m.scale (sx, sy)
  *   (3) as m.scale (sx, sy, sz)
  *
- * The first form scales the x, y and z axis by the constant factor f.  The
- * second form scales x and y axis with factors sx and sy, respectively, while
- * leaving the z axis unscaled.  The third form multiplies x, y and z axis
+ * The first form scales x, y and z axis by the constant factor f.  The second
+ * form scales x and y axis with the factors sx and sy, respectively, while
+ * leaving z axis unscaled.  The third form scales x, y and z axis separately
  * with factors sx, sy and sz, respectively.
  *
- * The function updates 'this' matrix and returns a reference to the
- * 'this' matrix.  The returned value may be used for chaining mathematical
- * operations.
+ * The function updates the left-hand matrix and returns a reference to it.
  *
  * Example:
  *
@@ -1476,15 +1522,15 @@ Matrix.prototype.scale = function (/*...*/) {
 /**
  * Construct scaled matrix.
  *
- * Function excepts to receive a Matrix object or an array convertible to
- * Matrix object as the first input argument.  Scaling factors are given as
- * arguments 2, 3 and 4 as in function Matrix.transform.
+ * Function excepts to receive a matrix object or an array convertible to
+ * matrix object as the first input argument and scaling factors as further
+ * input arguments.
  *
  * The function multiplies the input matrix with the scaling factors and
- * returns the result as a new Matrix object.  The input matrix is not
+ * returns the result as a new matrix object.  The input matrix is not
  * modified in the process.
  *
- * @param mixed m
+ * @param mixed m Source matrix
  * @param float sx
  * @param float sy
  * @param float sz
@@ -1498,19 +1544,22 @@ Matrix.scale = function (/*...*/) {
 /**
  * Translate origin.
  *
- * The function expects to receive a vector or an array convertible to vector
- * as in input argument.
+ * The function expects to receive a vector or an array convertible to
+ * vector as an input argument.
  *
- * The function updates 'this' matrix and returns a reference to the
- * 'this' matrix.  The returned value may be used for chaining mathematical
- * operations.
+ * The function updates the left-hand matrix and returns a reference to it.
+ * The returned value may be used for chaining mathematical operations.
  *
  * Example:
  *
- *     // Set v to [ 0, 0, 0, 1 ]
- *     var m = new Matrix ();
- *     m.translate (1, 2, 3);
- *     var v = m.transform (
+ *     // Returns [ 0, 0, 0, 1 ]
+ *     var v = m.transform (0, 0, 0);
+ *
+ *     // Translate origin
+ *     m.translate ([ 1, 2, 3 ]);
+ *
+ *     // Now returns [ 1, 2, 3, 1 ]
+ *     var v = m.transform (0, 0, 0);
  *
  * @param Vector v
  * @return Matrix
@@ -1535,27 +1584,30 @@ Matrix.prototype.translate = function (/*...*/) {
 /**
  * Construct translated matrix.
  *
- * The function expects to receive a matrix and vector, or arrays convertible
- * to matrix and vector, as input arguments.
+ * The function expects to receive matrix and vector as input arguments.  The
+ * arguments may be matrix and vector objects or arrays convertible to matrix
+ * and vector.
  *
- * The function will multiply the matrix with the translation vector and
- * return the result as a new Matrix object.  No source operands are modified
- * in the process.
+ * The function multiplies the left-hand matrix with the translation matrix
+ * produced from the right-hand vector and returns the result as a new matrix
+ * object.  No arguments are modified in the process.
  *
  * @param Matrix m
  * @param Vector v
  * @return Matrix
  */
-Matrix.translate = function (m, v) {
-    var dup = new Matrix (m);
-    return dup.translate (v);
+Matrix.translate = function (/*...*/) {
+    var m = new Matrix (arguments[0]);
+    return m.translate.apply (m, Array.prototype.slice.call (arguments, 1));
 };
 
 /**
  * Transpose matrix.
  *
- * The function transposes the 'this' matrix and returns a reference to the
- * 'this' matrix.
+ * The function expects no arguments.
+ *
+ * The function exchanges rows and columns of the left-hand matrix and returns
+ * a reference to it.
  *
  * @return Matrix
  */
@@ -1577,12 +1629,11 @@ Matrix.prototype.transpose = function () {
 /**
  * Construct transpose of a matrix.
  *
- * The function expects to receive a Matrix object or an array convertible to
- * Matrix as an input argument.
+ * The function expects to receive a matrix object or an array convertible to
+ * matrix object as an input argument.
  *
- * The function transposes the argument matrix and returns a new Matrix object
- * that contains the result.  The input argument is not modified in the
- * process.
+ * The function returns a new matrix object where each row stores a column of
+ * the source matrix.  The input argument is not modified in the process.
  *
  * @param Matrix m
  * @return Matrix
@@ -1590,5 +1641,200 @@ Matrix.prototype.transpose = function () {
 Matrix.transpose = function (m) {
     var dup = new Matrix (m);
     return dup.transpose ();
+};
+
+/**
+ * Rotate around x axis.
+ *
+ * The function is an alias for rotate (angle, [1, 0, 0]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.xrotate = function (angle) {
+    /* Convert to radians */
+    var rad = angle * Math.PI / 180;
+
+    /* Construct rotation matrix */
+    var a = Math.sin (rad);
+    var b = -a;
+    var c = Math.cos (rad);
+    var m = [
+        [ 1, 0, 0, 0 ],
+        [ 0, c, b, 0 ],
+        [ 0, a, c, 0 ],
+        [ 0, 0, 0, 1 ]
+    ];
+
+    /* Multiply current matrix */
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+
+/**
+ * Construct rotated matrix.
+ *
+ * The function expects to receive a matrix object or an array convertible to
+ * matrix as the first input argument and a rotation angle in degrees as the
+ * second input argument.
+ *
+ * The function rotates the matrix around the x axis and returns the result as
+ * a new matrix object.  The source matrix is not modified in the process.
+ *
+ * @param mixed m Source matrix (object or array)
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.xrotate = function (m, angle) {
+    var dup = new Matrix (m);
+    return dup.xrotate (angle);
+};
+
+/**
+ * Rotate around y axis.
+ *
+ * The function is an alias for rotate (angle, [0, 1, 0]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.yrotate = function (angle) {
+    /* Convert to radians */
+    var rad = angle * Math.PI / 180;
+
+    /* Construct rotation matrix */
+    var a = Math.sin (rad);
+    var b = -a;
+    var c = Math.cos (rad);
+    var m = [
+        [ c, 0, a, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ b, 0, c, 0 ],
+        [ 0, 0, 0, 1 ]
+    ];
+
+    /* Multiply current matrix */
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+
+/**
+ * Construct rotated matrix.
+ *
+ * The function expects to receive a matrix object or an array convertible to
+ * matrix as the first input argument and a rotation angle in degrees as the
+ * second input argument.
+ *
+ * The function rotates the matrix around the y axis and returns the result as
+ * a new matrix object.  The source matrix is not modified in the process.
+ *
+ * @param mixed m Source matrix (object or array)
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.yrotate = function (m, angle) {
+    var dup = new Matrix (m);
+    return dup.yrotate (angle);
+};
+
+/**
+ * Rotate around z axis.
+ *
+ * The function is an alias for rotate (angle, [0, 0, 1]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.zrotate = function (angle) {
+    /* Convert to radians */
+    var rad = angle * Math.PI / 180;
+
+    /* Construct rotation matrix */
+    var a = Math.sin (rad);
+    var b = -a;
+    var c = Math.cos (rad);
+    var m = [
+        [ c, b, 0, 0 ],
+        [ a, c, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ]
+    ];
+
+    /* Multiply current matrix */
+    Matrix._mul2 (this, this, m);
+    return this;
+};
+
+/**
+ * Construct rotated matrix.
+ *
+ * The function expects to receive a matrix object or an array convertible to
+ * matrix as the first input argument and a rotation angle in degrees as the
+ * second input argument.
+ *
+ * The function rotates the matrix around the z axis and returns the result as
+ * a new matrix object.  The source matrix is not modified in the process.
+ *
+ * @param mixed m Source matrix (object or array)
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.zrotate = function (m, angle) {
+    var dup = new Matrix (m);
+    return dup.zrotate (angle);
+};
+
+/**
+ * Rotate around vector.
+ *
+ * The function expects to receive a rotation angle in degrees as the first
+ * input argument and a vector object or an array convertible to vector as the
+ * second argument.  If the second argument is omitted, then the function
+ * rotates around z-axis.
+ *
+ * The function constructs a rotation matrix from the input arguments and
+ * multiplies the left-hand matrix with this rotation matrix.  The function
+ * stores the result to the left-hand matrix and returns a reference to it.
+ *
+ * @param float angle Rotation angle in degrees
+ * @param mixed v Optional axis of rotation (vector or array)
+ * @return Matrix
+ */
+Matrix.prototype.rotate = function (/*...*/) {
+    /* Get rotation angle in degrees */
+    var angle = VectorMath.parseFloat (arguments[0]);
+
+    /* Convert rotation angle to radians */
+    var rad = angle * Math.PI / 180;
+
+    /* Get axis of rotation */
+    var v;
+    if (arguments.length == 1) {
+        v = new Vector (0, 0, 1);
+    } else if (arguments.length == 2) {
+        v = new Vector (arguments[1]);
+    } else {
+        throw new Error ('Invalid arguments');
+    }
+
+    /* Normalize axis of rotation */
+    v.normalize ();
+
+    /* Construct rotation matrix */
+    var x = v[0];
+    var y = v[1];
+    var z = v[2];
+    var c = Math.cos (rad);
+    var s = Math.sin (rad);
+    var m = [
+        [ x*x*(1-c)+c,   x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0 ],
+        [ y*x*(1-c)+z*s, y*y*(1-c)+c,   y*z*(1-c)-x*s, 0 ],
+        [ x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z*(1-c)+c,   0 ],
+        [ 0,             0,             0,             1 ]
+    ];
+
+    /* Multiply current matrix with rotation matrix */
+    Matrix._mul3 (this, this, m);
+    return this;
 };
 

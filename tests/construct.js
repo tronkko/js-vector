@@ -104,21 +104,11 @@ Test.module ('Vector.construct', function () {
         return [ v.x, v.y, v.z, v.w ];
     }, [ 0.25, 0.5, 0.75, 1.0 ]);
 
-    /* Construction with invalid w component fails */
+    /* Zero w component renders the vector infinite */
     this.test ('construct-141.0', function () {
-        var ok = false;
-        try {
-
-            /* Try to create a vector with invalid w component */
-            var v = new Vector (1, 2, 3, 0);
-
-        }
-        catch (e) {
-            /* Got an exception as expected */
-            ok = true;
-        }
-        return ok;
-    });
+        var v = new Vector (1, 2, 3, 0);
+        return v.x > 1000000;
+    }, true);
 
     /* Cloning a vector preserves the original coordinate */
     this.test ('construct-150.0', function () {

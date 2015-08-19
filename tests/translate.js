@@ -153,5 +153,16 @@ Test.module ('Matrix.translate', function () {
         return [ v[0], v[1], v[2], v[3] ];
     }, [ -10, -12, -20, 1 ]);
 
+    /* Static version can be invoked with separate coordinate components */
+    this.test ('translate-171.0', function () {
+        var m = new Matrix ();
+        var x = Matrix.translate (m, 1, 2, 3);
+        return [ x[0], x[1], x[2], x[3] ];
+    }, [
+        [ 1, 0, 0, 1 ], 
+        [ 0, 1, 0, 2 ],
+        [ 0, 0, 1, 3 ],
+        [ 0, 0, 0, 1 ]
+    ]);
 });
 
