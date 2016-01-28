@@ -30,7 +30,7 @@ Test.module ('Matrix.rotate', function () {
         return [ v.x, v.y, v.z ];
     }, [ 1, 1, 1 ]);
 
-    /* Center point is not affected by rotation (irrespective of angle) */
+    /* Center point is not affected by rotation */
     this.test ('rotate-110.1', function () {
         var m = new Matrix ();
         m.translate (1, 2, 3);
@@ -103,7 +103,7 @@ Test.module ('Matrix.rotate', function () {
         return [ v.x, v.y, v.z ];
     }, [ 0, 2, 0 ]);
 
-    /* Function rotate is really an alias for xrotate, yrotate and zrotate */
+    /* Function xrotate, yrotate and zrotate are aliases for rotate */
     this.test ('rotate-140.0', function () {
         var m = new Matrix ();
         m.rotate (90, [ 1, 0, 0 ]);
@@ -123,13 +123,37 @@ Test.module ('Matrix.rotate', function () {
         return [ v.x, v.y, v.z ];
     }, [ 0, 2, 0 ]);
 
-    /* Function rotate will normalize axis */
+    /* Function rotate will normalize the axis of rotation */
     this.test ('rotate-150.0', function () {
         var m = new Matrix ();
         m.rotate (90, [ 9, 0, 0 ]);
         var v = m.transform ([ 0, 1, 0 ]);
         return [ v.x, v.y, v.z ];
     }, [ 0, 0, 1 ]);
+
+    /* Axis of rotation may be omitted */
+    this.test ('rotate-160.0', function () {
+        var m = new Matrix ();
+        m.rotate (90);
+        var v = m.transform ([ 2, 0, 0 ]);
+        return [ v.x, v.y, v.z ];
+    }, [ 0, 2, 0 ]);
+
+    /* Static function works same as member function */
+    this.test ('rotate-170.0', function () {
+        var m = new Matrix ();
+        var q = Matrix.rotate (m, 90);
+        var v = q.transform ([ 2, 0, 0 ]);
+        return [ v.x, v.y, v.z ];
+    }, [ 0, 2, 0 ]);
+
+    /* Static function does not modify its argument */
+    this.test ('rotate-171.0', function () {
+        var m = new Matrix ();
+        var q = Matrix.rotate (m, 90);
+        var v = m.transform ([ 2, 0, 0 ]);
+        return [ v.x, v.y, v.z ];
+    }, [ 2, 0, 0 ]);
 
 });
 

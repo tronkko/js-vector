@@ -61,6 +61,24 @@ Test.module ('Matrix.scale', function () {
         [ 41, 42, 43, 44 ]
     ]);
 
+    /* Scaling with number and its inverse changes nothing */
+    this.test ('scale-103.0', function () {
+        var m = new Matrix ([
+            [ 11, 12, 13, 14 ], 
+            [ 21, 22, 23, 24 ],
+            [ 31, 32, 33, 34 ],
+            [ 41, 42, 43, 44 ]
+        ]);
+        m.scale (10);
+        m.scale (1.0/10);
+        return [ m[0], m[1], m[2], m[3] ];
+    }, [
+        [ 11, 12, 13, 14 ], 
+        [ 21, 22, 23, 24 ],
+        [ 31, 32, 33, 34 ],
+        [ 41, 42, 43, 44 ]
+    ]);
+
     /* X, y and z axis may be scaled by constant factor */
     this.test ('scale-110.0', function () {
         var m = new Matrix ();

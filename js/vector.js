@@ -1135,239 +1135,6 @@ Matrix.prototype.mul = function (b) {
     return this;
 };
 
-/* Multiply with 3x1 submatrix at upper right corner */
-Matrix._mul1 = function (c, a, b) {
-    var b1 = b[0];
-    var b2 = b[1];
-    var b3 = b[2];
-    var b4 = b[3];
-
-    var a1 = a[0];
-    var a11 = a1[0];
-    var a12 = a1[1];
-    var a13 = a1[2];
-    var a14 = a1[3];
-    var r1 = [
-        a11,
-        a12,
-        a13,
-        a11 * b1[3] + a12 * b2[3] + a13 * b3[3] + a14
-    ];
-
-    var a2 = a[1];
-    var a21 = a2[0];
-    var a22 = a2[1];
-    var a23 = a2[2];
-    var a24 = a2[3];
-    var r2 = [
-        a21,
-        a22,
-        a23,
-        a21 * b1[3] + a22 * b2[3] + a23 * b3[3] + a24
-    ];
-
-    var a3 = a[2];
-    var a31 = a3[0];
-    var a32 = a3[1];
-    var a33 = a3[2];
-    var a34 = a3[3];
-    var r3 = [
-        a31,
-        a32,
-        a33,
-        a31 * b1[3] + a32 * b2[3] + a33 * b3[3] + a34
-    ];
-
-    var a4 = a[3];
-    var a41 = a4[0];
-    var a42 = a4[1];
-    var a43 = a4[2];
-    var a44 = a4[3];
-    var r4 = [
-        a41,
-        a42,
-        a43,
-        a41 * b1[3] + a42 * b2[3] + a43 * b3[3] + a44
-    ];
-
-    /* Store result */
-    c[0] = r1;
-    c[1] = r2;
-    c[2] = r3;
-    c[3] = r4;
-};
-
-/* Multiply with 2x2 submatrix at upper left corner */
-Matrix._mul2 = function (c, a, b) {
-    var b1 = b[0];
-    var b2 = b[1];
-
-    var a1 = a[0];
-    var a11 = a1[0];
-    var a12 = a1[1];
-    var r1 = [
-        a11 * b1[0] + a12 * b2[0],
-        a11 * b1[1] + a12 * b2[1],
-        a1[2],
-        a1[3]
-    ];
-
-    var a2 = a[1];
-    var a21 = a2[0];
-    var a22 = a2[1];
-    var r2 = [
-        a21 * b1[0] + a22 * b2[0],
-        a21 * b1[1] + a22 * b2[1],
-        a2[2],
-        a2[3]
-    ];
-
-    var a3 = a[2];
-    var a31 = a3[0];
-    var a32 = a3[1];
-    var r3 = [
-        a31 * b1[0] + a32 * b2[0],
-        a31 * b1[1] + a32 * b2[1],
-        a3[2],
-        a3[3]
-    ];
-
-    var a4 = a[3];
-    var a41 = a4[0];
-    var a42 = a4[1];
-    var r4 = [
-        a41 * b1[0] + a42 * b2[0],
-        a41 * b1[1] + a42 * b2[1],
-        a4[2],
-        a4[3]
-    ];
-
-    /* Store result */
-    c[0] = r1;
-    c[1] = r2;
-    c[2] = r3;
-    c[3] = r4;
-};
-
-/* Multiply with 3x3 submatrix at upper left corner */
-Matrix._mul3 = function (c, a, b) {
-    var b1 = b[0];
-    var b2 = b[1];
-    var b3 = b[2];
-
-    var a1 = a[0];
-    var a11 = a1[0];
-    var a12 = a1[1];
-    var a13 = a1[2];
-    var r1 = [
-        a11 * b1[0] + a12 * b2[0] + a13 * b3[0],
-        a11 * b1[1] + a12 * b2[1] + a13 * b3[1],
-        a11 * b1[2] + a12 * b2[2] + a13 * b3[2],
-        a1[3]
-    ];
-
-    var a2 = a[1];
-    var a21 = a2[0];
-    var a22 = a2[1];
-    var a23 = a2[2];
-    var r2 = [
-        a21 * b1[0] + a22 * b2[0] + a23 * b3[0],
-        a21 * b1[1] + a22 * b2[1] + a23 * b3[1],
-        a21 * b1[2] + a22 * b2[2] + a23 * b3[2],
-        a2[3]
-    ];
-
-    var a3 = a[2];
-    var a31 = a3[0];
-    var a32 = a3[1];
-    var a33 = a3[2];
-    var r3 = [
-        a31 * b1[0] + a32 * b2[0] + a33 * b3[0],
-        a31 * b1[1] + a32 * b2[1] + a33 * b3[1],
-        a31 * b1[2] + a32 * b2[2] + a33 * b3[2],
-        a3[3]
-    ];
-
-    var a4 = a[3];
-    var a41 = a4[0];
-    var a42 = a4[1];
-    var a43 = a4[2];
-    var r4 = [
-        a41 * b1[0] + a42 * b2[0] + a43 * b3[0],
-        a41 * b1[1] + a42 * b2[1] + a43 * b3[1],
-        a41 * b1[2] + a42 * b2[2] + a43 * b3[2],
-        a4[3]
-    ];
-
-    /* Store result */
-    c[0] = r1;
-    c[1] = r2;
-    c[2] = r3;
-    c[3] = r4;
-};
-
-/* Full 4x4 matrix multiply */
-Matrix._mul4 = function (c, a, b) {
-    var b1 = b[0];
-    var b2 = b[1];
-    var b3 = b[2];
-    var b4 = b[3];
-
-    var a1 = a[0];
-    var a11 = a1[0];
-    var a12 = a1[1];
-    var a13 = a1[2];
-    var a14 = a1[3];
-    var r1 = [
-        a11 * b1[0] + a12 * b2[0] + a13 * b3[0] + a14 * b4[0],
-        a11 * b1[1] + a12 * b2[1] + a13 * b3[1] + a14 * b4[1],
-        a11 * b1[2] + a12 * b2[2] + a13 * b3[2] + a14 * b4[2],
-        a11 * b1[3] + a12 * b2[3] + a13 * b3[3] + a14 * b4[3]
-    ];
-
-    var a2 = a[1];
-    var a21 = a2[0];
-    var a22 = a2[1];
-    var a23 = a2[2];
-    var a24 = a2[3];
-    var r2 = [
-        a21 * b1[0] + a22 * b2[0] + a23 * b3[0] + a24 * b4[0],
-        a21 * b1[1] + a22 * b2[1] + a23 * b3[1] + a24 * b4[1],
-        a21 * b1[2] + a22 * b2[2] + a23 * b3[2] + a24 * b4[2],
-        a21 * b1[3] + a22 * b2[3] + a23 * b3[3] + a24 * b4[3]
-    ];
-
-    var a3 = a[2];
-    var a31 = a3[0];
-    var a32 = a3[1];
-    var a33 = a3[2];
-    var a34 = a3[3];
-    var r3 = [
-        a31 * b1[0] + a32 * b2[0] + a33 * b3[0] + a34 * b4[0],
-        a31 * b1[1] + a32 * b2[1] + a33 * b3[1] + a34 * b4[1],
-        a31 * b1[2] + a32 * b2[2] + a33 * b3[2] + a34 * b4[2],
-        a31 * b1[3] + a32 * b2[3] + a33 * b3[3] + a34 * b4[3]
-    ];
-
-    var a4 = a[3];
-    var a41 = a4[0];
-    var a42 = a4[1];
-    var a43 = a4[2];
-    var a44 = a4[3];
-    var r4 = [
-        a41 * b1[0] + a42 * b2[0] + a43 * b3[0] + a44 * b4[0],
-        a41 * b1[1] + a42 * b2[1] + a43 * b3[1] + a44 * b4[1],
-        a41 * b1[2] + a42 * b2[2] + a43 * b3[2] + a44 * b4[2],
-        a41 * b1[3] + a42 * b2[3] + a43 * b3[3] + a44 * b4[3]
-    ];
-
-    /* Store result */
-    c[0] = r1;
-    c[1] = r2;
-    c[2] = r3;
-    c[3] = r4;
-};
-
 /**
  * Multiply two matrices.
  *
@@ -1386,6 +1153,535 @@ Matrix.mul = function (a, b) {
     var c = new Matrix ();
     Matrix._mul4 (c, a, b);
     return c;
+};
+
+/**
+ * Reverse multiply matrix.
+ *
+ * The function expects to receive left-hand matrix as an input argument.
+ * This argument may be a matrix object or an array convertible to matrix.
+ *
+ * The function multiplies 'this' with the argument and stores the result to
+ * the 'this' matrix.
+ *
+ * @param mixed a Left-hand operator
+ * @return Matrix
+ */
+Matrix.prototype.rmul = function (a) {
+    /* Do a full 4x4 matrix multiply since contents of a are unknown */
+    Matrix._mul4 (this, Matrix.getInstance (a), this);
+    return this;
+};
+
+/* 
+ * Multiply 4x4 matrix with 1x3 submatrix at upper right corner
+ *
+ *     c11 c12 c13 c14     a11 a12 a13 a14     1 0 0 b14
+ *     c21 c22 c23 c24  =  a21 a22 a23 a24  *  0 1 0 b24
+ *     c31 c32 c33 c34     a31 a32 a33 a34     0 0 1 b34
+ *     c41 c42 c43 c44     a41 a42 a43 a44     0 0 0 1
+ */
+Matrix._mul1 = function (c, a, b) {
+    var b14 = b[0][3]
+    var b24 = b[1][3];
+    var b34 = b[2][3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        /*c11*/ a11,
+        /*c12*/ a12,
+        /*c13*/ a13,
+        /*c14*/ a11 * b14 + a12 * b24 + a13 * b34 + a14
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        /*c21*/ a21,
+        /*c22*/ a22,
+        /*c23*/ a23,
+        /*c24*/ a21 * b14 + a22 * b24 + a23 * b34 + a24
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        /*c31*/ a31,
+        /*c32*/ a32,
+        /*c33*/ a33,
+        /*c34*/ a31 * b14 + a32 * b24 + a33 * b34 + a34
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        /*c41*/ a41,
+        /*c42*/ a42,
+        /*c43*/ a43,
+        /*c44*/ a41 * b14 + a42 * b24 + a43 * b34 + a44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/*
+ * Multiply 1x3 submatrix at upper right corner with 4x4 matrix
+ *
+ *     c11 c12 c13 c14     1 0 0 a14     b11 b12 b13 b14
+ *     c21 c22 c23 c24  =  0 1 0 a24  *  b21 b22 b23 b24
+ *     c31 c32 c33 c34     0 0 1 a34     b31 b32 b33 b34
+ *     c41 c42 c43 c44     0 0 0 1       b41 b42 b43 b44
+ */
+Matrix._rmul1 = function (c, a, b) {
+    var b1 = b[0];
+    var b2 = b[1];
+    var b3 = b[2];
+    var b4 = b[3];
+    var b41 = b4[0];
+    var b42 = b4[1];
+    var b43 = b4[2];
+    var b44 = b4[3];
+
+    var a14 = a[0][3];
+    var r1 = [
+        /*c11*/ b1[0] + a14 * b41,
+        /*c12*/ b1[1] + a14 * b42,
+        /*c13*/ b1[2] + a14 * b43,
+        /*c14*/ b1[3] + a14 * b44
+    ];
+
+    var a24 = a[1][3];
+    var r2 = [
+        /*c21*/ b2[0] + a24 * b41,
+        /*c22*/ b2[1] + a24 * b42,
+        /*c23*/ b2[2] + a24 * b43,
+        /*c24*/ b2[3] + a24 * b44
+    ];
+
+    var a34 = a[2][3];
+    var r3 = [
+        /*c31*/ b3[0] + a34 * b41,
+        /*c32*/ b3[1] + a34 * b42,
+        /*c33*/ b3[2] + a34 * b43,
+        /*c34*/ b3[3] + a34 * b44
+    ];
+
+    var r4 = [
+        /*c41*/ b41,
+        /*c42*/ b42,
+        /*c43*/ b43,
+        /*c44*/ b44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/*
+ * Multiply 4x4 matrix with 2x2 submatrix at upper left corner
+ *
+ *     c11 c12 c13 c14     a11 a12 a13 a14     b11 b12 0 0
+ *     c21 c22 c23 c24  =  a21 a22 a23 a24  *  b21 b22 0 0
+ *     c31 c32 c33 c34     a31 a32 a33 a34     0   0   1 0
+ *     c41 c42 c43 c44     a41 a42 a43 a44     0   0   0 1
+ */
+Matrix._mul2 = function (c, a, b) {
+    var b1 = b[0];
+    var b11 = b1[0];
+    var b12 = b1[1];
+    var b2 = b[1];
+    var b21 = b2[0];
+    var b22 = b2[1];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        /*c11*/ a11 * b11 + a12 * b21,
+        /*c12*/ a11 * b12 + a12 * b22,
+        /*c13*/ a13,
+        /*c14*/ a14
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        /*c21*/ a21 * b11 + a22 * b21,
+        /*c22*/ a21 * b12 + a22 * b22,
+        /*c23*/ a23,
+        /*c24*/ a24
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        /*c31*/ a31 * b11 + a32 * b21,
+        /*c32*/ a31 * b12 + a32 * b22,
+        /*c33*/ a33,
+        /*c34*/ a34
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        /*c41*/ a41 * b11 + a42 * b21,
+        /*c42*/ a41 * b12 + a42 * b22,
+        /*c43*/ a43,
+        /*c44*/ a44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/*
+ * Multiply 2x2 submatrix at upper left corner with 4x4 matrix
+ *
+ *     c11 c12 c13 c14     a11 a12 0 0     b11 b12 b13 b14
+ *     c21 c22 c23 c24  =  a21 a22 0 0  *  b21 b22 b23 b24
+ *     c31 c32 c33 c34     0   0   1 0     b31 b32 b33 b34
+ *     c41 c42 c43 c44     0   0   0 1     b41 b42 b43 b44
+ */
+Matrix._rmul2 = function (c, a, b) {
+    var b1 = b[0];
+    var b11 = b1[0];
+    var b12 = b1[1];
+    var b13 = b1[2];
+    var b14 = b1[3];
+    var b2 = b[1];
+    var b21 = b2[0];
+    var b22 = b2[1];
+    var b23 = b2[2];
+    var b24 = b2[3];
+    var b3 = b[2];
+    var b31 = b3[0];
+    var b32 = b3[1];
+    var b33 = b3[2];
+    var b34 = b3[3];
+    var b4 = b[3];
+    var b41 = b4[0];
+    var b42 = b4[1];
+    var b43 = b4[2];
+    var b44 = b4[3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var r1 = [
+        /*c11*/ a11 * b11 + a12 * b21,
+        /*c12*/ a11 * b12 + a12 * b22,
+        /*c13*/ a11 * b13 + a12 * b23,
+        /*c14*/ a11 * b14 + a12 * b24
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var r2 = [
+        /*c21*/ a21 * b11 + a22 * b21,
+        /*c22*/ a21 * b12 + a22 * b22,
+        /*c23*/ a21 * b13 + a22 * b23,
+        /*c24*/ a21 * b14 + a22 * b24
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var r3 = [
+        /*c31*/ a31 * b11 + a32 * b21 + b31,
+        /*c32*/ a31 * b12 + a32 * b22 + b32,
+        /*c33*/ a31 * b13 + a32 * b23 + b33,
+        /*c34*/ a31 * b14 + a32 * b24 + b34
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var r4 = [
+        /*c41*/ a41 * b11 + a42 * b21 + b41,
+        /*c42*/ a41 * b12 + a42 * b22 + b42,
+        /*c43*/ a41 * b13 + a42 * b23 + b43,
+        /*c44*/ a41 * b14 + a42 * b24 + b44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/*
+ * Multiply 4x4 matrix with 3x3 submatrix at upper left corner
+ *
+ *     c11 c12 c13 c14     a11 a12 a13 a14     b11 b12 b13 0
+ *     c21 c22 c23 c24  =  a21 a22 a23 a24  *  b21 b22 b23 0
+ *     c31 c32 c33 c34     a31 a32 a33 a34     b31 b32 b33 0
+ *     c41 c42 c43 c44     a41 a42 a43 a44     0   0   0   1
+ */
+Matrix._mul3 = function (c, a, b) {
+    var b1 = b[0];
+    var b11 = b1[0];
+    var b12 = b1[1];
+    var b13 = b1[2];
+    var b2 = b[1];
+    var b21 = b2[0];
+    var b22 = b2[1];
+    var b23 = b2[2];
+    var b3 = b[2];
+    var b31 = b3[0];
+    var b32 = b3[1];
+    var b33 = b3[2];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        /*c11*/ a11 * b11 + a12 * b21 + a13 * b31,
+        /*c12*/ a11 * b12 + a12 * b22 + a13 * b32,
+        /*c13*/ a11 * b13 + a12 * b23 + a13 * b33,
+        /*c14*/ a14
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        /*c21*/ a21 * b11 + a22 * b21 + a23 * b31,
+        /*c22*/ a21 * b12 + a22 * b22 + a23 * b32,
+        /*c23*/ a21 * b13 + a22 * b23 + a23 * b33,
+        /*c24*/ a24
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        /*c31*/ a31 * b11 + a32 * b21 + a33 * b31,
+        /*c32*/ a31 * b12 + a32 * b22 + a33 * b32,
+        /*c33*/ a31 * b13 + a32 * b23 + a33 * b33,
+        /*c34*/ a34
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        /*c41*/ a41 * b11 + a42 * b21 + a43 * b31,
+        /*c42*/ a41 * b12 + a42 * b22 + a43 * b32,
+        /*c43*/ a41 * b13 + a42 * b23 + a43 * b33,
+        /*c44*/ a44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/* 
+ * Multiply 3x3 submatrix at upper left corner with 4x4 matrix
+ *
+ *     c11 c12 c13 c14     a11 a12 a13 0     b11 b12 b13 b14
+ *     c21 c22 c23 c24  =  a21 a22 a23 0  *  b21 b22 b23 b24
+ *     c31 c32 c33 c34     a31 a32 a33 0     b31 b32 b33 b34
+ *     c41 c42 c43 c44     0   0   0   1     b41 b42 b43 b44
+ */
+Matrix._rmul3 = function (c, a, b) {
+    var b1 = b[0];
+    var b11 = b1[0];
+    var b12 = b1[1];
+    var b13 = b1[2];
+    var b14 = b1[3];
+    var b2 = b[1];
+    var b21 = b2[0];
+    var b22 = b2[1];
+    var b23 = b2[2];
+    var b24 = b2[3];
+    var b3 = b[2];
+    var b31 = b3[0];
+    var b32 = b3[1];
+    var b33 = b3[2];
+    var b34 = b3[3];
+    var b4 = b[3];
+    var b41 = b4[0];
+    var b42 = b4[1];
+    var b43 = b4[2];
+    var b44 = b4[3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var r1 = [
+        /*c11*/ a11 * b11 + a12 * b21 + a13 * b31,
+        /*c12*/ a11 * b12 + a12 * b22 + a13 * b32,
+        /*c13*/ a11 * b13 + a12 * b23 + a13 * b33,
+        /*c14*/ a11 * b14 + a12 * b24 + a13 * b34
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var r2 = [
+        /*c21*/ a21 * b11 + a22 * b21 + a23 * b31,
+        /*c22*/ a21 * b12 + a22 * b22 + a23 * b32,
+        /*c23*/ a21 * b13 + a22 * b23 + a23 * b33,
+        /*c24*/ a21 * b14 + a22 * b24 + a23 * b34
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var r3 = [
+        /*c31*/ a31 * b11 + a32 * b21 + a33 * b31,
+        /*c32*/ a31 * b12 + a32 * b22 + a33 * b32,
+        /*c33*/ a31 * b13 + a32 * b23 + a33 * b33,
+        /*c34*/ a31 * b14 + a32 * b24 + a33 * b34
+    ];
+
+    var r4 = [
+        /*c41*/ b41,
+        /*c42*/ b42,
+        /*c43*/ b43,
+        /*c44*/ b44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
+};
+
+/*
+ * Full 4x4 matrix multiply
+ *
+ *     c11 c12 c13 c14     a11 a12 a13 a14     b11 b12 b13 b14
+ *     c21 c22 c23 c24  =  a21 a22 a23 a24  *  b21 b22 b23 b24
+ *     c31 c32 c33 c34     a31 a32 a33 a34     b31 b32 b33 b34
+ *     c41 c42 c43 c44     a41 a42 a43 a44     b41 b42 b43 b44
+ */
+Matrix._mul4 = function (c, a, b) {
+    var b1 = b[0];
+    var b11 = b1[0];
+    var b12 = b1[1];
+    var b13 = b1[2];
+    var b14 = b1[3];
+    var b2 = b[1];
+    var b21 = b2[0];
+    var b22 = b2[1];
+    var b23 = b2[2];
+    var b24 = b2[3];
+    var b3 = b[2];
+    var b31 = b3[0];
+    var b32 = b3[1];
+    var b33 = b3[2];
+    var b34 = b3[3];
+    var b4 = b[3];
+    var b41 = b4[0];
+    var b42 = b4[1];
+    var b43 = b4[2];
+    var b44 = b4[3];
+
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+    var r1 = [
+        /*c11*/ a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41,
+        /*c12*/ a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42,
+        /*c13*/ a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43,
+        /*c14*/ a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44
+    ];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+    var r2 = [
+        /*c21*/ a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41,
+        /*c22*/ a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42,
+        /*c23*/ a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43,
+        /*c24*/ a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44
+    ];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+    var r3 = [
+        /*c31*/ a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41,
+        /*c32*/ a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42,
+        /*c33*/ a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43,
+        /*c34*/ a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44
+    ];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+    var r4 = [
+        /*c41*/ a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41,
+        /*c42*/ a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42,
+        /*c43*/ a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43,
+        /*c44*/ a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44
+    ];
+
+    /* Store result */
+    c[0] = r1;
+    c[1] = r2;
+    c[2] = r3;
+    c[3] = r4;
 };
 
 /**
@@ -1602,6 +1898,35 @@ Matrix.translate = function (/*...*/) {
 };
 
 /**
+ * Reverse-translate origin.
+ *
+ * The function expects to receive a vector or an array convertible to
+ * vector as an input argument.
+ *
+ * The function updates the left-hand matrix and returns a reference to it.
+ * The returned value may be used for chaining mathematical operations.
+ *
+ * @param Vector v
+ * @return Matrix
+ */
+Matrix.prototype.rtranslate = function (/*...*/) {
+    /* Convert argument to array */
+    var v = VectorMath.getArray (arguments, 1);
+
+    /* Construct reverse translation transformation */
+    var m = [
+        [ 1, 0, 0, -v[0] ],
+        [ 0, 1, 0, -v[1] ],
+        [ 0, 0, 1, -v[2] ],
+        [ 0, 0, 0, 1     ]
+    ];
+
+    /* Multiply translation matrix with current matrix */
+    Matrix._rmul1 (this, m, this);
+    return this;
+};
+
+/**
  * Transpose matrix.
  *
  * The function expects no arguments.
@@ -1652,6 +1977,11 @@ Matrix.transpose = function (m) {
  * @return Matrix
  */
 Matrix.prototype.xrotate = function (angle) {
+    var m = Matrix._xrotate (angle);
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+Matrix._xrotate = function (angle) {
     /* Convert to radians */
     var rad = angle * Math.PI / 180;
 
@@ -1665,10 +1995,7 @@ Matrix.prototype.xrotate = function (angle) {
         [ 0, a, c, 0 ],
         [ 0, 0, 0, 1 ]
     ];
-
-    /* Multiply current matrix */
-    Matrix._mul3 (this, this, m);
-    return this;
+    return m;
 };
 
 /**
@@ -1691,6 +2018,20 @@ Matrix.xrotate = function (m, angle) {
 };
 
 /**
+ * Reverse rotate around x axis.
+ *
+ * The function is an alias for rrotate (angle, [1, 0, 0]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.rxrotate = function (angle) {
+    var m = Matrix._xrotate (-angle);
+    Matrix._rmul3 (this, m, this);
+    return this;
+};
+
+/**
  * Rotate around y axis.
  *
  * The function is an alias for rotate (angle, [0, 1, 0]).
@@ -1699,6 +2040,11 @@ Matrix.xrotate = function (m, angle) {
  * @return Matrix
  */
 Matrix.prototype.yrotate = function (angle) {
+    var m = Matrix._yrotate (angle);
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+Matrix._yrotate = function (angle) {
     /* Convert to radians */
     var rad = angle * Math.PI / 180;
 
@@ -1712,10 +2058,7 @@ Matrix.prototype.yrotate = function (angle) {
         [ b, 0, c, 0 ],
         [ 0, 0, 0, 1 ]
     ];
-
-    /* Multiply current matrix */
-    Matrix._mul3 (this, this, m);
-    return this;
+    return m;
 };
 
 /**
@@ -1738,6 +2081,20 @@ Matrix.yrotate = function (m, angle) {
 };
 
 /**
+ * Reverse rotate around y axis.
+ *
+ * The function is an alias for rrotate (angle, [0, 1, 0]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.ryrotate = function (angle) {
+    var m = Matrix._yrotate (-angle);
+    Matrix._rmul3 (this, m, this);
+    return this;
+};
+
+/**
  * Rotate around z axis.
  *
  * The function is an alias for rotate (angle, [0, 0, 1]).
@@ -1746,6 +2103,11 @@ Matrix.yrotate = function (m, angle) {
  * @return Matrix
  */
 Matrix.prototype.zrotate = function (angle) {
+    var m = Matrix._zrotate (angle);
+    Matrix._mul2 (this, this, m);
+    return this;
+};
+Matrix._zrotate = function (angle) {
     /* Convert to radians */
     var rad = angle * Math.PI / 180;
 
@@ -1759,10 +2121,7 @@ Matrix.prototype.zrotate = function (angle) {
         [ 0, 0, 1, 0 ],
         [ 0, 0, 0, 1 ]
     ];
-
-    /* Multiply current matrix */
-    Matrix._mul2 (this, this, m);
-    return this;
+    return m;
 };
 
 /**
@@ -1785,6 +2144,20 @@ Matrix.zrotate = function (m, angle) {
 };
 
 /**
+ * Reverse rotate around z axis.
+ *
+ * The function is an alias for rrotate (angle, [0, 0, 1]).
+ *
+ * @param float angle Rotation angle in degrees
+ * @return Matrix
+ */
+Matrix.prototype.rzrotate = function (angle) {
+    var m = Matrix._zrotate (-angle);
+    Matrix._rmul2 (this, m, this);
+    return this;
+};
+
+/**
  * Rotate around vector.
  *
  * The function expects to receive a rotation angle in degrees as the first
@@ -1804,8 +2177,90 @@ Matrix.prototype.rotate = function (/*...*/) {
     /* Get rotation angle in degrees */
     var angle = VectorMath.parseFloat (arguments[0]);
 
+    /* Get axis of rotation */
+    var v;
+    if (arguments.length == 1) {
+        v = new Vector (0, 0, 1);
+    } else if (arguments.length == 2) {
+        v = new Vector (arguments[1]);
+    } else {
+        throw new Error ('Invalid arguments');
+    }
+
+    /* Construct rotation matrix */
+    var m = Matrix._rotate (angle, v);
+
+    /* Multiply current matrix with rotation matrix */
+    Matrix._mul3 (this, this, m);
+    return this;
+};
+Matrix._rotate = function (angle, v) {
     /* Convert rotation angle to radians */
     var rad = angle * Math.PI / 180;
+
+    /* Normalize rotation axis */
+    var q = Vector.normalize (v);
+
+    /* 
+     * Construct rotation matrix.
+     *
+     * See https://en.wikipedia.org/wiki/Rotation_matrix#Axis_and_angle
+     */
+    var x = q[0];
+    var y = q[1];
+    var z = q[2];
+    var c = Math.cos (rad);
+    var s = Math.sin (rad);
+    var m = [
+        [ x*x*(1-c)+c,   x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0 ],
+        [ y*x*(1-c)+z*s, y*y*(1-c)+c,   y*z*(1-c)-x*s, 0 ],
+        [ x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z*(1-c)+c,   0 ],
+        [ 0,             0,             0,             1 ]
+    ];
+    return m;
+};
+
+/**
+ * Construct rotated matrix.
+ *
+ * The function expects to receive matrix, rotation angle and vector as input
+ * arguments.  If the vector is omitted, then the function rotates around
+ * z-axis.
+ *
+ * The function constructs a rotation matrix from the input arguments and
+ * multiplies the first argument with this rotation matrix.  The result of
+ * this multiplication is returned.  No input arguments are modified in the
+ * process.
+ *
+ * @param Matrix a Left-hand argument
+ * @param float angle Rotation angle in degrees
+ * @param mixed v Optional axis of rotation (vector or array)
+ * @return Matrix
+ */
+Matrix.rotate = function (/*...*/) {
+    var m = new Matrix (arguments[0]);
+    return m.rotate.apply (m, Array.prototype.slice.call (arguments, 1));
+};
+
+/**
+ * Reverse rotate around vector.
+ *
+ * The function expects to receive a rotation angle in degrees as the first
+ * input argument and a vector object or an array convertible to vector as the
+ * second argument.  If the second argument is omitted, then the function
+ * rotates around z-axis.
+ *
+ * The function constructs a rotation matrix from the input arguments and
+ * multiplies this rotation matrix with the left-hand matrix.  The function
+ * stores the result to the left-hand matrix and returns a reference to it.
+ *
+ * @param float angle Rotation angle in degrees
+ * @param mixed v Optional axis of rotation (vector or array)
+ * @return Matrix
+ */
+Matrix.prototype.rrotate = function (/*...*/) {
+    /* Get rotation angle in degrees */
+    var angle = VectorMath.parseFloat (arguments[0]);
 
     /* Get axis of rotation */
     var v;
@@ -1817,24 +2272,421 @@ Matrix.prototype.rotate = function (/*...*/) {
         throw new Error ('Invalid arguments');
     }
 
-    /* Normalize axis of rotation */
-    v.normalize ();
+    /* Get reverse rotation matrix */
+    var m = Matrix._rotate (-angle, v);
 
-    /* Construct rotation matrix */
-    var x = v[0];
-    var y = v[1];
-    var z = v[2];
-    var c = Math.cos (rad);
-    var s = Math.sin (rad);
-    var m = [
-        [ x*x*(1-c)+c,   x*y*(1-c)-z*s, x*z*(1-c)+y*s, 0 ],
-        [ y*x*(1-c)+z*s, y*y*(1-c)+c,   y*z*(1-c)-x*s, 0 ],
-        [ x*z*(1-c)-y*s, y*z*(1-c)+x*s, z*z*(1-c)+c,   0 ],
-        [ 0,             0,             0,             1 ]
-    ];
-
-    /* Multiply current matrix with rotation matrix */
-    Matrix._mul3 (this, this, m);
+    /* Multiply rotation matrix with current matrix */
+    Matrix._rmul3 (this, m, this);
     return this;
+};
+
+/**
+ * Construct viewing transformation.
+ *
+ * The function expects to receive vectors v, p and u as input arguments.  The
+ * vector v defines the location of the viewer in 3d-space, the vector p
+ * defines the point of interest and the vector u defines the upward direction
+ * of the view.
+ *
+ * The function updates the right-hand matrix and returns a reference to it.
+ *
+ * @param Vector v Viewer location
+ * @param Vector p Point of interest
+ * @param Vector u Upward direction
+ * @return Matrix
+ */
+Matrix.prototype.lookAt = function (v, p, u) {
+    var m = Matrix._lookAt (v, p, u);
+    Matrix._mul4 (this, this, m);
+    return this;
+};
+Matrix._lookAt = function (v, p, u) {
+    /* Convert argument to vector */
+    var v = Vector.getInstance (v);
+
+    /* Point z axis to the point of interest */
+    var z = Vector.normalize (Vector.sub (p, v));
+
+    /* Point x axis to the right */
+    var x = Vector.normalize (Vector.cross (z, u));
+
+    /* Point y axis to the up */
+    var y = Vector.normalize (Vector.cross (x, z));
+
+    /* Define viewing transformation */
+    var m = [
+        [ x[0], y[0], z[0], v[0] ],
+        [ x[1], y[1], z[1], v[1] ],
+        [ x[2], y[2], z[2], v[2] ],
+        [ 0,    0,    0,    1 ]
+    ];
+    return m;
+};
+
+/**
+ * Compute inverse matrix.
+ *
+ * The function expects no arguments.
+ *
+ * The function updates the left-hand matrix and returns a reference to it.
+ *
+ * @return Matrix
+ */
+Matrix.prototype.inverse = function () {
+    Matrix._inv4 (this, this);
+    return this;
+};
+
+/* Compute inverse of full 4x4 matrix using Cramer's rule */
+Matrix._inv4 = function (c, a) {
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+
+    /* 
+     * Compute 4x4 matrix of minors.
+     *
+     * Minor is the determinant of 3x3 sub-matrix that is obtained by ignoring
+     * the corresponding row and column of the original 4x4 matrix.  For
+     * example, to compute minor at row 2 column 2, you would leave out row 2
+     * and column 2 to create a 3x3 sub-matrix
+     *
+     *     a11 a12 a13 a14      a11 . a13 a14
+     *     a21 a22 a23 a24  =>  .   . .   . 
+     *     a31 a32 a33 a34      a31 . a33 a34 
+     *     a41 a42 a43 a44      a41 . a43 a44
+     *
+     * Determinant of the 3x3 sub-matrix can be computed by first copying
+     * the first two columns of 3x3 submatrix to form 5x3 matrix
+     *
+     *     a11 a13 a14      a11 a13 a14 a11 a13
+     *     a31 a33 a34  =>  a31 a33 a34 a31 a33
+     *     a41 a43 a44      a41 a43 a44 a41 a43
+     *
+     * and then multiplying along down-diagonals
+     *
+     *     a11 a13 a14 a11 a13
+     *       \   \   \
+     *        \   \   \
+     *         \   \   \
+     *     a31 a33 a34 a31 a33
+     *           \   \   \
+     *            \   \   \
+     *             \   \   \
+     *     a41 a43 a44 a41 a43
+     *
+     * and up-diagonals
+     *
+     *     a11 a13 a14 a11 a13
+     *             /   /   /
+     *            /   /   /
+     *           /   /   /
+     *     a31 a33 a34 a31 a33
+     *         /   /   /
+     *        /   /   /
+     *       /   /   /
+     *     a41 a43 a44 a41 a43
+     *
+     * The final determinant is obtained by adding down-diagonals and
+     * substracting up diagonals.
+     *
+     * Stapel, Elizabeth. "Determinants: 3x3 Determinants." Purplemath.
+     * Available from http://www.purplemath.com/modules/determs2.htm.
+     * Accessed 15 September 2015
+     */
+
+    /*
+     * a22 a23 a24 a22 a23
+     * a32 a33 a34 a32 a33
+     * a42 a43 a44 a42 a43
+     */
+    var m11 = a22*a33*a44 + a23*a34*a42 + a24*a32*a43
+            - a42*a33*a24 - a43*a34*a22 - a44*a32*a23;
+
+    /*
+     * a21 a23 a24 a21 a23
+     * a31 a33 a34 a31 a33
+     * a41 a43 a44 a41 a43
+     */
+    var m12 = a21*a33*a44 + a23*a34*a41 + a24*a31*a43
+            - a41*a33*a24 - a43*a34*a21 - a44*a31*a23;
+
+    /*
+     * a21 a22 a24 a21 a22
+     * a31 a32 a34 a31 a32
+     * a41 a42 a44 a41 a42
+     */
+    var m13 = a21*a32*a44 + a22*a34*a41 + a24*a31*a42
+            - a41*a32*a24 - a42*a34*a21 - a44*a31*a22;
+
+    /*
+     * a21 a22 a23 a21 a22
+     * a31 a32 a33 a31 a32
+     * a41 a42 a43 a41 a42
+     */
+    var m14 = a21*a32*a43 + a22*a33*a41 * a23*a31*a42
+            - a41*a32*a23 - a42*a33*a21 - a43*a31*a22;
+
+    /*
+     * a12 a13 a14 a12 a13
+     * a32 a33 a34 a32 a33
+     * a42 a43 a44 a42 a43
+     */
+    var m21 = a12*a33*a44 + a13*a34*a42 + a14*a32*a43
+            - a42*a33*a14 - a43*a34*a12 - a44*a32*a13;
+
+    /*
+     * a11 a13 a14 a11 a13
+     * a31 a33 a34 a31 a33
+     * a41 a43 a44 a41 a43
+     */
+    var m22 = a11*a33*a44 + a13*a34*a41 + a14*a31*a43
+            - a41*a33*a14 - a43*a34*a11 - a44*a31*a13;
+
+    /*
+     * a11 a12 a14 a11 a12
+     * a31 a32 a34 a31 a32
+     * a41 a42 a44 a41 a42
+     */
+    var m23 = a11*a32*a44 + a12*a34*a41 + a14*a31*a42
+            - a41*a32*a14 - a42*a34*a11 - a44*a31*a12;
+
+    /*
+     * a11 a12 a13 a11 a12
+     * a31 a32 a33 a31 a32
+     * a41 a42 a43 a41 a42
+     */
+    var m24 = a11*a32*a43 + a12*a33*a41 + a13*a31*a42
+            - a41*a32*a13 - a42*a33*a11 - a43*a31*a12;
+
+    /*
+     * a12 a13 a14 a12 a13
+     * a22 a23 a24 a22 a23
+     * a42 a43 a44 a42 a43
+     */
+    var m31 = a12*a23*a44 + a13*a24*a42 + a14*a22*a43
+            - a42*a23*a14 - a43*a24*a12 - a44*a22*a13;
+
+    /*
+     * a11 a13 a14 a11 a13
+     * a21 a23 a24 a21 a23
+     * a41 a43 a44 a41 a43
+     */
+    var m32 = a11*a23*a44 + a13*a24*a41 + a14*a21*a43
+            - a41*a23*a14 - a43*a24*a11 - a44*a21*a13;
+
+    /*
+     * a11 a12 a14 a11 a12
+     * a21 a22 a24 a21 a22
+     * a41 a42 a44 a41 a42
+     */
+    var m33 = a11*a22*a44 + a12*a24*a41 + a14*a21*a42
+            - a41*a22*a14 - a42*a24*a11 - a44*a21*a12;
+
+    /*
+     * a11 a12 a13 a11 a12
+     * a21 a22 a23 a21 a22
+     * a41 a42 a43 a41 a42
+     */
+    var m34 = a11*a22*a43 + a12*a23*a41 + a13*a21*a42
+            - a41*a22*a13 - a42*a23*a11 - a43*a21*a12;
+
+    /*
+     * a12 a13 a14 a12 a13
+     * a22 a23 a24 a22 a23
+     * a32 a33 a34 a32 a33
+     */
+    var m41 = a12*a23*a34 + a13*a24*a32 + a14*a22*a33
+            - a32*a23*a14 - a33*a24*a12 - a34*a22*a13;
+
+    /*
+     * a11 a13 a14 a11 a13
+     * a21 a23 a24 a21 a23
+     * a31 a33 a34 a31 a33
+     */
+    var m42 = a11*a23*a34 + a13*a24*a31 + a14*a21*a33
+            - a31*a23*a14 - a33*a24*a11 - a34*a21*a13;
+
+    /*
+     * a11 a12 a14 a11 a12
+     * a21 a22 a24 a21 a22
+     * a31 a32 a34 a31 a32
+     */
+    var m43 = a11*a22*a34 + a12*a24*a31 + a14*a21*a32
+            - a31*a22*a14 - a32*a24*a11 - a34*a21*a12;
+
+    /*
+     * a11 a12 a13 a11 a12
+     * a21 a22 a23 a21 a22
+     * a31 a32 a33 a31 a32
+     */
+    var m44 = a11*a22*a33 + a12*a23*a31 + a13*a21*a32
+            - a31*a22*a13 - a32*a23*a11 - a33*a21*a12;
+
+    /* Compute determinant */
+    var det = a11*m11 - a12*m12 + a13*m13 - a14*m14;
+    if (Math.abs (det) > 1.0e-6) {
+
+        /* 
+         * Apply cofactors, compute adjugate and divide the adjugate by
+         * determinant to obtain the inverse matrix.
+         */
+        var invdet = 1.0 / det;
+        c[0] = [
+             m11 * invdet,
+            -m21 * invdet,
+             m31 * invdet,
+            -m41 * invdet
+        ];
+        c[1] = [
+            -m12 * invdet,
+             m22 * invdet,
+            -m32 * invdet,
+             m42 * invdet,
+        ];
+        c[2] = [
+             m13 * invdet,
+            -m23 * invdet,
+             m33 * invdet,
+            -m43 * invdet,
+        ];
+        c[3] = [
+            -m14 * invdet,
+             m24 * invdet,
+            -m34 * invdet,
+             m44 * invdet
+        ];
+
+    } else {
+        throw new Error ("Cannot compute inverse");
+    }
+};
+
+/* Compute inverse of 4x3 submatrix at upper left corner */
+Matrix._inv3 = function (c, a) {
+    var a1 = a[0];
+    var a11 = a1[0];
+    var a12 = a1[1];
+    var a13 = a1[2];
+    var a14 = a1[3];
+
+    var a2 = a[1];
+    var a21 = a2[0];
+    var a22 = a2[1];
+    var a23 = a2[2];
+    var a24 = a2[3];
+
+    var a3 = a[2];
+    var a31 = a3[0];
+    var a32 = a3[1];
+    var a33 = a3[2];
+    var a34 = a3[3];
+
+    var a4 = a[3];
+    var a41 = a4[0];
+    var a42 = a4[1];
+    var a43 = a4[2];
+    var a44 = a4[3];
+
+    /* Compute matrix of minors */
+    var m11 = a22*a33-a32*a23;
+    var m12 = a21*a33-a31*a23;
+    var m13 = a21*a32-a31*a22;
+    var m21 = a12*a33-a32*a13;
+    var m22 = a11*a33-a31*a13;
+    var m23 = a11*a32-a31*a12;
+    var m31 = a12*a23-a22*a13;
+    var m32 = a11*a23-a21*a13;
+    var m33 = a11*a22-a21*a12;
+    var m41 = a12*a23*a34+a13*a24*a32+a14*a22*a33-a32*a23*a14-a33*a24*a12-a34*a22*a13;
+    var m42 = a11*a23*a34+a13*a24*a31+a14*a21*a33-a31*a23*a14-a33*a24*a11-a34*a21*a13;
+    var m43 = a11*a22*a34+a12*a24*a31+a14*a21*a32-a31*a22*a14-a32*a24*a11-a34*a21*a12;
+    var m44 = a11*a22*a33+a12*a23*a31+a13*a21*a32-a31*a22*a13-a32*a23*a11-a33*a21*a12;
+
+    /* Compute determinant */
+    var det = a11*m11 - a12*m12 + a13*m13;
+    if (Math.abs (det) > 1.0e-6) {
+
+        /* 
+         * Apply cofactors, compute adjugate and divide the adjugate by
+         * determinant to obtain the inverse matrix.
+         */
+        var invdet = 1.0 / det;
+        c[0] = [
+             m11 * invdet,
+            -m21 * invdet,
+             m31 * invdet,
+            -m41 * invdet
+        ];
+        c[1] = [
+            -m12 * invdet,
+             m22 * invdet,
+            -m32 * invdet,
+             m42 * invdet,
+        ];
+        c[2] = [
+             m13 * invdet,
+            -m23 * invdet,
+             m33 * invdet,
+            -m43 * invdet,
+        ];
+        c[3] = [
+             0,
+             0,
+             0,
+             m44 * invdet
+        ];
+
+    } else {
+        throw new Error ("Cannot compute inverse");
+    }
+};
+
+
+/**
+ * Compute inverse of matrix.
+ *
+ * The function expects to receive a matrix or an array convertible to
+ * matrix as an argument.
+ *
+ * The function computes the inverse of the argument matrix and returns the
+ * result as a new matrix object.  The input matrix is not modified in the
+ * process.
+ *
+ * @param mixed m Input matrix (object or array)
+ * @return Matrix
+ */
+Matrix.inverse = function (m) {
+    var r = new Matrix ();
+    Matrix._inv4 (r, m);
+    return r;
+};
+
+Matrix.prototype.ortho = function () {
+    /* FIXME: */
+};
+
+Matrix.prototype.perspective = function () {
+    /* FIXME: */
 };
 

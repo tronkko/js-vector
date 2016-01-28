@@ -12,8 +12,8 @@ Test.module ('Efficiency', function () {
     /* Fail test is current implementation is x times slower than the best */
     var eps = 10;
 
-    /* Set this true to show execution times */
-    var verbose = false;
+    /* Set this true to show execution times in console */
+    var verbose = true;
 
     /* Efficiency of matrix creation */
     this.test ('eff-100.0', function () {
@@ -38,10 +38,10 @@ Test.module ('Efficiency', function () {
 
         /* Print execution times */
         if (!ok  ||  verbose) {
-            console.log ('Create Float32Array ' + a);
-            console.log ('Create indexed ' + b);
-            console.log ('Create associative ' + c);
-            console.log ('Create object ' + d);
+            console.log ('Create Float32Array ' + (a*1000000/n) + ' us');
+            console.log ('Create indexed ' + (b*1000000/n) + ' us');
+            console.log ('Create associative ' + (c*1000000/n) + ' us');
+            console.log ('Create object ' + (d*1000000/n) + ' us');
         }
         return ok;
     });
@@ -69,12 +69,29 @@ Test.module ('Efficiency', function () {
 
         /* Print execution times */
         if (!ok  ||  verbose) {
-            console.log ('Mul Float32Array ' + a);
-            console.log ('Mul array ' + b);
-            console.log ('Mul assoc ' + c);
-            console.log ('Mul object ' + d);
+            console.log ('Mul Float32Array ' + (a*1000000/n) + ' us');
+            console.log ('Mul array ' + (b*1000000/n) + ' us');
+            console.log ('Mul assoc ' + (c*1000000/n) + ' us');
+            console.log ('Mul object ' + (d*1000000/n) + ' us');
         }
         return ok;
+    });
+
+    /* Efficiency of inversion */
+    this.test ('eff-200.0', function () {
+        var n = 1000000;
+
+        /* Time different algorithms */
+        var a = _invBaseline (n);
+        var b = _inv4 (n);
+        var c = _inv3 (n);
+
+        if (verbose) {
+            console.log ('Inverse transpose ' + (a*1000000/n) + ' us');
+            console.log ('Inverse inv4 ' + (b*1000000/n) + ' us');
+            console.log ('Inverse inv3 ' + (c*1000000/n) + ' us');
+        }
+        return true;
     });
 
 });
@@ -497,6 +514,57 @@ function _mulMatrixObject (n) {
     */
     return (stop.getTime () - start.getTime ()) / 1000.0;
 }
+
+/* Generate pseudo-random transformation matrix for getting baseline */
+function _invBaseline (n) {
+    var start = new Date ();
+    for (var i = 0; i < n; i++) {
+        /* Construct pseudo-random transformation */
+        var m = new Matrix ();
+        m.rotate (i / 1000);
+        m.translate ([ i / 1000, 1, 3 ]);
+
+        /* Transpose matrix */
+        m.transpose ();
+        _useVariable (m);
+    }
+    var stop = new Date ();
+    return (stop.getTime () - start.getTime ()) / 1000.0;
+};
+
+/* Compute inverses */
+function _inv4 (n) {
+    var start = new Date ();
+    for (var i = 0; i < n; i++) {
+        /* Construct pseudo-random transformation */
+        var m = new Matrix ();
+        m.rotate (i / 1000);
+        m.translate ([ i / 1000, 1, 3 ]);
+
+        /* Compute inverse */
+        Matrix._inv4 (m, m);
+        _useVariable (m);
+    }
+    var stop = new Date ();
+    return (stop.getTime () - start.getTime ()) / 1000.0;
+};
+
+/* Compute inverses */
+function _inv3 (n) {
+    var start = new Date ();
+    for (var i = 0; i < n; i++) {
+        /* Construct pseudo-random transformation */
+        var m = new Matrix ();
+        m.rotate (i / 1000);
+        m.translate ([ i / 1000, 1, 3 ]);
+
+        /* Compute inverse */
+        Matrix._inv3 (m, m);
+        _useVariable (m);
+    }
+    var stop = new Date ();
+    return (stop.getTime () - start.getTime ()) / 1000.0;
+};
 
 /* Use variable to prevent browsers from optimizing it away */
 function _useVariable (c) {
