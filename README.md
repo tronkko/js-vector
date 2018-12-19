@@ -63,14 +63,14 @@ following mathematical operations to compute them:
 where variables `a`, `b` and `c` represent vectors while `f` represents a
 floating point number.
 
-The above operations will never modify a parameter vector.  This allows
-you to build complicated calculations without creating temporary vectors
-explicitly.  For example, you can compute the distance between
+The above operations never modify parameter vectors a or b.  This allows
+you to build complicated calculations without side effects or temporary
+vectors.  For example, you can compute the distance between
 points `p` and `q` simply as
 ```
 var distance = Vector.len (Vector.sub (p, q));
 ```
-without modifying the vector `p` by accident.
+without modifying `p` or `q` by accident.
 
 If you do wish to modify a vector, then assign the result to a variable
 or use object versions of the above operations.  For example, to update
@@ -90,7 +90,7 @@ you can chain mathematical operations.
 
 ## Temporary Vectors
 
-If you need a temporary copy of the vector for the computation,
+If you need a temporary copy of the vector for a computation,
 then you can duplicate vectors the `new` operation:
 ```
 var dup = new Vector (source);
@@ -112,12 +112,12 @@ var v = new Vector ({ x:1, y:2, z:3 });
 ```
 
 The array representation is especially useful in computation as it allows
-you to create temporary vectors easily.  For example, instead of creating
+you to create temporary vectors on the fly.  For example, instead of creating
 vector (1,0,0) explicitly as in
 ```
 v.add (new Vector (1, 0, 0));
 ```
-you simply use an array
+you can simply use an array instead
 ```
 v.add ([ 1, 0, 0 ]);
 ```
